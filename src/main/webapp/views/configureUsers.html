@@ -1,0 +1,35 @@
+<div class="row">
+	<div class="col-md-11 text-center">
+		Select group: 
+		<select ng-model="selectedGroup">
+			<option value="">- Select one -</option>
+			<option ng-repeat="group in usersByGroup" value="{{group.groupId}}" ng-bind="group.groupName"></option>
+		</select>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-11">
+		<div class="col-md-3" style="text-align:right;">
+			<select ng-model="selectedLeftGroup" size="10">
+				<option ng-repeat="user in leftUsers" value="{{user.userId}}" ng-bind="user.userName"></option>
+			</select>
+		</div>
+		<div class="col-md-1">
+			<button ng-click="removeUser()"><</button>
+			<div class="clear"><br/></div>
+			<button ng-click="addUser()">></button>
+		</div>
+		<div class="col-md-3">
+			<select ng-model="selectedRightGroup"  size="10">
+				<option ng-repeat="user in rightUsers" value="{{user.userId}}" ng-bind="user.userName"></option>
+			</select>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-11">
+		<input type="button" class="btn btn-success" value="Save"/>
+	</div>
+</div>

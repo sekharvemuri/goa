@@ -1,0 +1,43 @@
+<div class="col-md-12 tab-container">
+	<table class="table">
+		<tr>
+			<th>Id</th>
+			<th>Name</th>
+			<th>Action</th>
+		</tr>
+		<tr ng-repeat="comodity in comodities">
+			<td ng-bind="comodity.comodityId"></td>
+			<td ng-bind="comodity.comodityName"></td>
+			<td>
+				<div class="pointer">
+                    <span class="glyphicon glyphicon-menu-hamburger" ng-click="editComodity($index)"></span>
+                    <span class="glyphicon glyphicon-remove" ng-click="deleteComodity($index)"></span>
+                </div>
+			</td>
+		</tr>
+	</table>
+	
+	<div class="btn btn-success" ng-click="addComodity()">Add comodity</div>
+</div>
+
+<script type="text/ng-template" id="comodity-modal.html">
+    <div class="modal-header">
+        <h3 class="modal-title" ng-bind="heading"></h3>
+    </div>
+    <div class="modal-body">
+		<div class="row popup-row">
+            <div class="col-md-12">
+                <div class="col-md-6 text-right popup-label">
+                    <label for="comodity-name">Comodity name:</label>
+                </div>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="comodity-name" ng-model="comodity.comodityName"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">Save</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+    </div>
+</script>

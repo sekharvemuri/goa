@@ -1,0 +1,179 @@
+<div class="row header-div hide">
+    <div class="col-md-10">
+        <div class="col-md-5 groups-length">
+            Total number of groups: <span ng-bind="groups.length"></span>
+        </div>
+        <div class="col-md-5 groups-length">
+            <label for="date">Select date:</label>
+            <select id="date" ng-model="dateValue" ng-change="refreshData()">
+                <option ng-repeat="previousOrderTime in previousOrderTimes" value="{{previousOrderTime}}" ng-bind="formatDate(previousOrderTime)"></option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="group-wrapper">
+    <uib-accordion close-others="true">
+        <uib-accordion-group heading="{{group.groupName}}" classname="{{getClass($index)}}" ng-init="result=isOpened($index)" is-open="result" ng-repeat="group in groups" template-url="group-template.html">
+            <div class="row" ng-init="grpIndex = $index">
+                <div class="col-md-12">
+                    <div class="userList" ng-bind="group.users"></div>
+                </div>
+            </div>
+            <div class="row commodity-wrapper" ng-repeat="pastCommodity in group.orderData">
+                <div class="col-md-12 commodity">
+                    <div class="commodity-value commodity-name">
+                        <span ng-bind="pastCommodity.comodity.comodityName"></span><br/>
+                        <span class="legend">Commodity</span>
+                    </div>
+                    <span class="delimiter">-</span>
+                    <div class="commodity-value commodity-enddate">
+                        <span ng-bind="formatDate(pastCommodity.expiryDate)"></span><br/>
+                        <span class="legend">Exp. date</span>
+                    </div>
+                    <span class="delimiter">-</span>
+                    <div class="commodity-value commodity-pastvalue">
+                        <span ng-bind="pastCommodity.orderAverageValue"></span><br/>
+                        <span class="legend">Last tx value</span>
+                    </div>
+                    <span class="delimiter">-</span>
+                    <div class="commodity-value commodity-unitprice">
+                        <span ng-bind="pastCommodity.orderValue"></span><br/>
+                        <span class="legend">Unit value</span>
+                    </div>
+                    <span class="delimiter">-</span>
+                    <div class="commodity-value commodity-quantity">
+                        <span ng-bind="pastCommodity.quantity"></span><br/>
+                        <span class="legend">Quantity</span>
+                    </div>
+                    <span class="delimiter">-</span>
+                    <div class="commodity-value commodity-option" ng-bind="pastCommodity.sellBuyOption"></div>
+                    <div class="commodity-value pointer">
+                        <span class="glyphicon glyphicon-menu-hamburger" ng-click="editCommodity(grpIndex, $index)"></span>
+                    </div>
+                    <div class="commodity-value btn-danger pointer remove-btn" ng-click="removeCommodity(grpIndex, $index)">
+                        -
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 add-btn-wrapper">
+                    <button type="button" class="btn btn-info" ng-click="addNewCommodity(grpIndex)">Add new commodity</button>
+                </div>
+            </div>
+        </uib-accordion-group>
+    </uib-accordion>
+
+    <div class="empty-div"></div>
+    <div class="row footer text-center">
+        <div class="col-md-10">
+            <button class="btn btn-success place-order" ng-click="placeOrder()">Place order</button>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template" id="group-template.html">
+    <div class="panel {{panelClass || 'panel-default'}}">
+        <div class="panel-heading" ng-click="toggleOpen()" ng-class="classname">
+            <h4 class="panel-title">
+            <a href tabindex="0" class="accordion-toggle" uib-accordion-transclude="heading"><span
+                ng-class="{'text-muted': isDisabled}">{{heading}}</span></a>
+            </h4>
+        </div>
+        <div class="panel-collapse collapse" uib-collapse="!isOpen">
+            <div class="panel-body" style="text-align: right" ng-transclude></div>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="myModalContent.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Add/Update commodity</h3>
+    </div>
+    <div class="modal-body">
+        <div class="row popup-row">
+            <div class="col-md-12">
+                <div class="col-md-6 text-right popup-label">
+                    <label for="dd-commodity">Select commodity:</label>
+                </div>
+                <div class="col-md-6">
+					<select class="form-control" id="dd-commodity" ng-model="commodity.comodity" 
+						ng-options="comm.comodityName for comm in commodities track by comm.comodityId"></select>
+                </div>
+            </div>
+        </div>
+        <div class="row popup-row">
+            <div class="col-md-12">
+                <div class="col-md-6 text-right popup-label">
+                    <label for="exp-date">Expiry date:</label>
+                </div>
+                <div class="col-md-6 left">
+                    <!-- <input type="text" class="form-control left" uib-datepicker-popup="{{format}}" ng-model="commodity.expiryDate" is-open="status.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" id="exp-date"/>
+                    <span class="input-group-btn left">
+                        <button type="button" class="btn btn-default calendar-icon" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span> -->
+
+                    <select class="form-control" id="dd-commodity" ng-model="commodity.expiryDate">
+                        <option value="">- Select one -</option>
+                        <option ng-repeat="expiryDate in expiryDates" value="{{expiryDate.expiryDate}}" ng-bind="formatDate(expiryDate.expiryDate)">
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row popup-row">
+            <div class="col-md-12">
+                <div class="col-md-6 text-right popup-label">
+                    <label for="unit-value">Unit value:</label>
+                </div>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="unit-value" ng-model="commodity.orderValue"/>
+                </div>
+            </div>
+        </div>
+        <div class="row popup-row">
+            <div class="col-md-12">
+                <div class="col-md-6 text-right popup-label">
+                    <label for="last-sold-value">Last transaction value:</label>
+                </div>
+                <div class="col-md-6">
+                    <label id="last-sold-value" ng-bind="formatValue(commodity.orderAverageValue)"></label>
+                </div>
+            </div>
+        </div>
+        <div class="row popup-row">
+            <div class="col-md-12">
+                <div class="col-md-6 text-right popup-label">
+                    <label for="quantity">Quantity:</label>
+                </div>
+                <div class="col-md-6">
+                    <select id="quantity" class="form-control" ng-model="commodity.quantity">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row popup-row">
+            <div class="col-md-12">
+                <div class="col-md-6 text-right popup-label">
+                    <label for="transaction-type">Select your transaction option:</label>
+                </div>
+                <div class="col-md-6">
+                    <div class="btn-group" id="transaction-type">
+                        <label class="btn btn-primary" ng-model="commodity.sellBuyOption" uib-btn-radio="'BUY'">Buy</label>
+                        <label class="btn btn-primary" ng-model="commodity.sellBuyOption" uib-btn-radio="'SELL'">Sell</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">Save</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+    </div>
+</script>

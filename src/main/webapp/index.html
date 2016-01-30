@@ -1,0 +1,68 @@
+<!doctype html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <title>Home</title>
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,200,300,400,600" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="styles/bootstrap.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- build:css(.tmp) styles/main.css -->
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
+  </head>
+  <body ng-app="CommoditiesApp">
+    <!--[if lt IE 7]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+    <header>
+    	<div class="col-md-11 header-wrapper" ng-controller="HeaderController">
+    		<div class="col-md-3">
+    			<button class="btn btn-info header-btn" ng-click="showGroups()">Groups</button>
+    		</div>
+    		<div class="col-md-3">
+    			<button class="btn btn-info header-btn" ng-click="showComodities()">Comodities</button>
+    		</div>
+    		<div class="col-md-3">
+    			<button class="btn btn-info header-btn" ng-click="showTypes()">Types</button>
+    		</div>
+    		<div class="col-md-3">
+    			<button class="btn btn-info header-btn" ng-click="showUsers()">Users</button>
+    		</div>
+    	</div>
+    	<div class="clear"></div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <div ng-view=""></div>
+
+    <!-- build:js(.) scripts/vendor.js -->
+    <!-- bower:js -->
+        <!-- <script data-main="main" src="bower_components/requirejs/require.js"></script> -->
+
+        <script type="text/javascript" src="bower_components/angular/angular.js"></script>
+        <script type="text/javascript" src="bower_components/angular-route/angular-route.js"></script>
+        <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap-tpls-0.14.3.js"></script>
+
+        <script type="text/javascript" src="scripts/app.js"></script>
+
+        <script type="text/javascript" src="scripts/controllers/HomeController.js"></script>
+        <script type="text/javascript" src="scripts/controllers/ModalController.js"></script>
+        <script type="text/javascript" src="scripts/controllers/OrderController.js"></script>
+        <script type="text/javascript" src="scripts/controllers/HeaderController.js"></script>
+        <script type="text/javascript" src="scripts/controllers/GroupController.js"></script>
+        <script type="text/javascript" src="scripts/controllers/ComodityController.js"></script>
+        <script type="text/javascript" src="scripts/controllers/TypeController.js"></script>
+        <script type="text/javascript" src="scripts/controllers/ConfigureComodityController.js"></script>
+        <script type="text/javascript" src="scripts/controllers/ConfigureUserController.js"></script>
+        <script type="text/javascript" src="scripts/controllers/UsersController.js"></script>
+        <script type="text/javascript" src="scripts/controllers/ComodityModalCtrl.js"></script>
+        <script type="text/javascript" src="scripts/controllers/GroupModalCtrl.js"></script>
+        <script type="text/javascript" src="scripts/controllers/UserModalCtrl.js"></script>
+
+        <script type="text/javascript" src="scripts/services/GroupService.js"></script>
+        <script type="text/javascript" src="scripts/services/OrderService.js"></script>
+        <script type="text/javascript" src="scripts/services/UserService.js"></script>
+        <script type="text/javascript" src="scripts/services/ComodityService.js"></script>
+    <!-- endbower -->
+  </body>
+</html>

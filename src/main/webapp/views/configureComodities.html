@@ -1,0 +1,35 @@
+<div class="row">
+	<div class="col-md-11 text-center">
+		Select group: 
+		<select ng-model="selectedGroup">
+			<option value="">- Select one -</option>
+			<option ng-repeat="group in comoditiesByGroup" value="{{group.groupId}}" ng-bind="group.groupName"></option>
+		</select>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-11">
+		<div class="col-md-3" style="text-align:right;">
+			<select ng-model="selectedLeftGroup" size="10">
+				<option ng-repeat="comodity in leftComodities" value="{{comodity.comodityId}}" ng-bind="comodity.comodityName"></option>
+			</select>
+		</div>
+		<div class="col-md-1">
+			<button ng-click="removeComodity()"><</button>
+			<div class="clear"><br/></div>
+			<button ng-click="addComodity()">></button>
+		</div>
+		<div class="col-md-3">
+			<select ng-model="selectedRightGroup"  size="10">
+				<option ng-repeat="comodity in rightComodities" value="{{comodity.comodityId}}" ng-bind="comodity.comodityName"></option>
+			</select>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-11">
+		<input type="button" class="btn btn-success" value="Save"/>
+	</div>
+</div>

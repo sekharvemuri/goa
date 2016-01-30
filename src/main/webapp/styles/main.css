@@ -1,0 +1,196 @@
+html, body{
+	margin: 0;
+}
+
+.hide{
+	display: none;
+}
+
+.left{
+	float: left;
+}
+
+.pointer{
+	cursor: pointer;
+}
+
+.text-center{
+	text-align: center;
+}
+
+.commodity-wrapper:nth-child(even) {
+	background: #FCF0DC;
+}
+
+/*Over riding bootstrap classes*/
+.panel-heading{
+	width: 100px;
+	cursor: pointer;
+}
+
+.panel{
+	border: none;
+}
+
+.panel-body div{
+	text-align: left;
+}
+
+/* App styles*/
+.commodity{
+	padding: 10px;
+	display: inline-block;
+}
+
+.group-wrapper{
+	width: 95%;
+	padding: 10px;
+}
+
+.commodity span.delimiter{
+	font-weight: bold;
+	float: left;
+	padding: 10px 0px;
+}
+
+.commodity-value{
+	text-align: center !important;
+	min-width: 65px;
+	padding: 10px 0px;
+	float: left;
+}
+
+.commodity-option{
+	min-width: 40px;
+}
+
+.remove-btn{
+	width: 40px;
+	border-radius: 3px;
+	height: 25px;
+	padding: 0px;
+	margin-top: 10px;
+}
+
+.commodity-wrapper{
+	max-width: 650px;
+	cursor: pointer;
+}
+
+.add-btn-wrapper{
+	margin: 10px;
+}
+
+.calendar-icon{
+	/*font-size: 10px !important;*/
+}
+
+.place-order{
+	margin: 0 auto;
+}
+
+.footer{
+	position: fixed;
+	bottom: 0px;
+	padding: 10px;
+	background-color: #fff;
+	width: 100%;
+}
+
+.grp-success{
+	background-color: #5cb85c !important;
+	text-align: center;
+	color: white !important;
+	font-weight: bold;
+}
+
+.grp-default{
+	text-align: center;
+	font-weight: bold;
+}
+
+
+.popup-row{
+	margin: 10px 0px;
+}
+
+#exp-date{
+	width: 90%;
+}
+
+#last-sold-value{
+	font-weight: bold;
+	text-align: center;
+	padding-left: 5px;
+}
+
+.clear{
+	clear: both;
+}
+
+.empty-div{
+	height: 50px;
+}
+
+.groups-length{
+	padding: 10px;
+}
+
+.header-div{
+	width: 90%;
+}
+
+.legend{
+	font-size: 10px;
+}
+
+.userList{
+	padding: 10px 0px;
+}
+
+.commodity-enddate{
+	min-width: 90px;
+}
+
+.left-over-grps .panel-heading{
+	width: 150px;
+}
+
+.header-wrapper{
+	padding: 10px;
+}
+
+.header-btn{
+	margin-top: 5px;
+}
+
+.tab-container{
+	padding: 10px;
+}
+
+.glyphicon-remove{
+	color: red;
+	font-weight: bold;
+}
+
+@media (max-width: 360px) {
+	.popup-label{
+		text-align: left;
+		margin: 8px 0px;
+	}	
+
+	.popup-row{
+		margin: 10px 0px;
+	}
+}
+
+@media (max-width: 640px) {
+	.popup-label{
+		text-align: left;
+		margin: 8px 0px;
+	}	
+
+	.popup-row{
+		margin: 10px 0px;
+	}
+}

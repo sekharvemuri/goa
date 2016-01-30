@@ -1,0 +1,69 @@
+<div class="col-md-12 tab-container">
+	<table class="table">
+		<tr>
+			<th>Id</th>
+			<th>Name</th>
+			<th>Email</th>
+			<th>Mobile</th>
+			<th>Action</th>
+		</tr>
+		<tr ng-repeat="user in users">
+			<td ng-bind="user.userId"></td>
+			<td ng-bind="user.userName"></td>
+			<td ng-bind="user.email"></td>
+			<td ng-bind="user.mobile"></td>
+			<td>
+				<div class="pointer">
+                    <span class="glyphicon glyphicon-menu-hamburger" ng-click="editUser($index)"></span>
+                    <span class="glyphicon glyphicon-remove" ng-click="deleteUser($index)"></span>
+                </div>
+			</td>
+		</tr>
+	</table>
+	
+	<div class="btn btn-success" ng-click="addUser()">Add user</div>
+</div>
+
+<script type="text/ng-template" id="user-modal.html">
+    <div class="modal-header">
+        <h3 class="modal-title" ng-bind="heading"></h3>
+    </div>
+    <div class="modal-body">
+		<div class="row popup-row">
+            <div class="col-md-12">
+                <div class="col-md-6 text-right popup-label">
+                    <label for="name">Name:</label>
+                </div>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="name" ng-model="user.userName"/>
+                </div>
+            </div>
+        </div>
+
+		<div class="row popup-row">
+            <div class="col-md-12">
+                <div class="col-md-6 text-right popup-label">
+                    <label for="email">Email:</label>
+                </div>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="email" ng-model="user.email"/>
+                </div>
+            </div>
+        </div>
+
+		<div class="row popup-row">
+            <div class="col-md-12">
+                <div class="col-md-6 text-right popup-label">
+                    <label for="mobile">Mobile:</label>
+                </div>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="mobile" ng-model="user.mobile"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">Save</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+    </div>
+</script>

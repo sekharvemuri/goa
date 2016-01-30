@@ -1,0 +1,60 @@
+{
+  "groups":[{
+    "name": "A",
+    "users": "Test1, Test2, Test3, Test4",
+    "pastData":[{
+      "id": 1,
+      "endDate": 1448769879879,
+      "option": "sell",
+      "unitValue": 20,
+      "lastSoldValue": 25,
+      "quantity": 98
+    },{
+      "id": 2,
+      "endDate": 1448769879879,
+      "option": "sell",
+      "unitValue": 30,
+      "lastSoldValue": 15,
+      "quantity": 10
+    },{
+      "id": 1,
+      "endDate": 1448769879879,
+      "option": "buy",
+      "unitValue": 30,
+      "lastSoldValue": 35,
+      "quantity": 75
+    }]
+  },{
+    "name": "B",
+    "users": "Test1, Test2, Test3, Test4",
+    "pastData":[{
+      "id": 3,
+      "endDate": 1448769879879,
+      "option": "sell",
+      "unitValue": 20,
+      "lastSoldValue": 25,
+      "quantity": 3
+    },{
+      "id": 3,
+      "endDate": 1448769879879,
+      "option": "sell",
+      "unitValue": 30,
+      "lastSoldValue": 15,
+      "quantity": 1
+    }]
+  },{
+    "name": "C",
+    "users": "Test1, Test2, Test3",
+    "pastData":[]
+  }],
+  "commodities":[{
+    "name":"copper",
+    "id":1
+  },{
+    "name":"Led",
+    "id":2
+  },{
+    "name":"Zync",
+    "id":3
+  }]
+}

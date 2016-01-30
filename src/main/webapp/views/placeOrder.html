@@ -1,0 +1,72 @@
+<div class="group-wrapper">
+	<uib-accordion close-others="true">
+	    <uib-accordion-group heading="{{group.groupName}}" classname="{{getClass($index)}}" ng-init="result=isOpened($index)" is-open="true" ng-repeat="group in nonEmptyGroups" template-url="group-template.html">
+	    	<div class="row" ng-init="grpIndex = $index">
+	    		<div class="col-md-12">
+	    			<div class="userList" ng-bind="group.users"></div>
+	    		</div>
+	    	</div>
+	    	<div class="row commodity-wrapper" ng-repeat="pastCommodity in group.orderData">
+	    		<div class="col-md-12 commodity">
+		    		<div class="commodity-value commodity-name">
+                        <span ng-bind="pastCommodity.comodity.comodityName"></span><br/>
+                        <span class="legend">Commodity</span>
+                    </div>
+		    		<span class="delimiter">-</span>
+		    		<div class="commodity-value commodity-enddate">
+                        <span ng-bind="formatDate(pastCommodity.expiryDate)"></span><br/>
+                        <span class="legend">Exp. date</span>
+                    </div>
+		    		<span class="delimiter">-</span>
+		    		<div class="commodity-value commodity-pastvalue">
+                        <span ng-bind="pastCommodity.orderAverageValue"></span><br/>
+                        <span class="legend">Last tx value</span>
+                    </div>
+		    		<span class="delimiter">-</span>
+		    		<div class="commodity-value commodity-unitprice">
+                        <span ng-bind="pastCommodity.orderValue"></span><br/>
+                        <span class="legend">Unit value</span>
+                    </div>
+		    		<span class="delimiter">-</span>
+		    		<div class="commodity-value commodity-quantity">
+                        <span ng-bind="pastCommodity.quantity"></span><br/>
+                        <span class="legend">Quantity</span>
+                    </div>
+		    		<span class="delimiter">-</span>
+		    		<div class="commodity-value commodity-option" ng-bind="pastCommodity.sellBuyOption"></div>
+		    	</div>
+	    	</div>
+	    </uib-accordion-group>
+	</uib-accordion>
+
+	<uib-accordion close-others="true" class="left-over-grps">
+	    <uib-accordion-group heading="Left over groups" is-open="true" template-url="group-template.html">
+	    	<div class="row">
+	    		<div class="col-md-5">
+	    			<div class="left-over-group" ng-repeat="leftOverGroup in emptyGroups" ng-bind="leftOverGroup.groupName"></div>
+	    		</div>
+	    	</div>
+	    </uib-accordion-group>
+	</uib-accordion>
+
+	<div class="empty-div"></div>
+	<div class="row footer text-center">
+		<div class="col-md-10">
+			<button class="btn btn-success place-order" ng-click="submitOrder()">Submit order</button>
+		</div>
+	</div>
+</div>
+
+<script type="text/ng-template" id="group-template.html">
+	<div class="panel {{panelClass || 'panel-default'}}">
+	  	<div class="panel-heading" ng-click="toggleOpen()" ng-class="classname">
+	    	<h4 class="panel-title">
+	      	<a href tabindex="0" class="accordion-toggle" uib-accordion-transclude="heading"><span
+	        	ng-class="{'text-muted': isDisabled}">{{heading}}</span></a>
+	    	</h4>
+	  	</div>
+	  	<div class="panel-collapse collapse" uib-collapse="!isOpen">
+	    	<div class="panel-body" style="text-align: right" ng-transclude></div>
+	  	</div>
+	</div>
+</script>

@@ -1,0 +1,53 @@
+<div class="col-md-12 tab-container">
+	<table class="table">
+		<tr>
+			<th>Id</th>
+			<th>Name</th>
+			<th>Action</th>
+		</tr>
+		<tr ng-repeat="group in groups">
+			<td ng-bind="group.groupId"></td>
+			<td ng-bind="group.groupName"></td>
+			<td>
+				<div class="pointer">
+                    <span class="glyphicon glyphicon-menu-hamburger" ng-click="editGroup($index)"></span>
+                    <span class="glyphicon glyphicon-remove" ng-click="deleteGroup($index)"></span>
+                </div>
+			</td>
+		</tr>
+	</table>
+	
+	<div class="col-md-12">
+		<div class="col-md-2">
+			<div class="btn btn-success" ng-click="addGroup()">Add group</div>
+		</div>
+		<div class="col-md-2">
+			<div class="btn btn-success" ng-click="configureComodities()">Configure comodities</div>
+		</div>
+		<div class="col-md-2">
+			<div class="btn btn-success" ng-click="configureUsers()">Configure users</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/ng-template" id="group-modal.html">
+    <div class="modal-header">
+        <h3 class="modal-title" ng-bind="heading"></h3>
+    </div>
+    <div class="modal-body">
+		<div class="row popup-row">
+            <div class="col-md-12">
+                <div class="col-md-6 text-right popup-label">
+                    <label for="comodity-name">Group name:</label>
+                </div>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="comodity-name" ng-model="group.groupName"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">Save</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+    </div>
+</script>
