@@ -4,12 +4,12 @@ import java.util.Collection;
 
 public class CollectionUtils {
 
-	public static boolean isEmpty(Collection<Object> coll) {
+	public static <E> boolean isEmpty(Collection<? extends E> coll) {
 		return (coll == null || coll.isEmpty()) ? Boolean.TRUE : Boolean.FALSE;
 	}
-	
-	public static boolean isNotEmpty(Collection<Object> coll) {
+
+	public static <E> boolean isNotEmpty(Collection<? extends E> coll) {
 		return !isEmpty(coll);
 	}
-	
+
 }

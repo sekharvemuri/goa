@@ -1,7 +1,7 @@
 app.service("GroupService", ['$http', function($http){
 	var service = {
 		getGroupData: function(){
-			return $http.get("rest/order/get").then(function(response){
+			return $http.get("rest/order").then(function(response){
 				return response.data;
 			}, function(){
 				console.log("error::: ");

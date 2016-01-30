@@ -1,14 +1,14 @@
 app.controller("ModalController", function($scope, $uibModalInstance, commodities, commodity, expiryDates){
 	$scope.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 	$scope.commodity = {
-		"comodity": "",
+		"commodity": "",
   		"expiryDate": "",
   		"orderValue": 0,
-  		"sellBuyOption": "",
+  		"option": "",
   		"orderAverageValue": 0,
   		"quantity": 0
 	};
-	if(commodity && commodity.commodity.comodityId){
+	if(commodity && commodity.commodity.id){
 		$scope.commodity = commodity;
 	}
 	$scope.commodities = commodities;
@@ -33,7 +33,7 @@ app.controller("ModalController", function($scope, $uibModalInstance, commoditie
 	}
 
 	$scope.ok = function () {
-		if(!$scope.commodity.comodity.comodityId){
+		if(!$scope.commodity.commodity.id){
 			$uibModalInstance.dismiss('cancel');
 		}
     	$uibModalInstance.close($scope.commodity);

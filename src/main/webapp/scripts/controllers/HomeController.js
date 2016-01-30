@@ -1,7 +1,7 @@
 app.controller("HomeController", ['$scope', 'groupData', '$uibModal', '$location', 
 	function($scope, groupData, $uibModal, $location){
     $scope.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-	$scope.commodities = groupData.comodities;
+	$scope.commodities = groupData.commodities;
 	$scope.groups = groupData.groups;
 	$scope.expiryDates = groupData.expiryDates;
 	$scope.previousOrderTimes = [];//groupData.previousOrderTimes;
@@ -22,8 +22,8 @@ app.controller("HomeController", ['$scope', 'groupData', '$uibModal', '$location
 	$scope.getCommodityName = function(comodityId){
 		var commodityName = "";
 		for(var i=0; i< $scope.commodities.length; i++){
-			if($scope.commodities[i].comodityId == comodityId){
-				commodityName = $scope.commodities[i].comodityName;
+			if($scope.commodities[i].id == comodityId){
+				commodityName = $scope.commodities[i].name;
 				break;
 			}
 		}

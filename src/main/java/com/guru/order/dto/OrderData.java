@@ -5,59 +5,86 @@ import java.io.Serializable;
 public class OrderData implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private ComodityDTO comodity;
+	private Long workOrderId;
+	private CommodityDTO commodity;
 	private Long expiryDate;
-	private String sellBuyOption;
+	private String option;
 	private int quantity;
 	private float orderAverageValue;
 	private float orderValue;
+	private float lastSoldValue;
+	private int lastSoldQuantity;
 
-	public ComodityDTO getComodity() {
-		return comodity;
+	public Long getWorkOrderId() {
+		return workOrderId;
 	}
 
-	public void setComodity(ComodityDTO comodity) {
-		this.comodity = comodity;
+	public void setWorkOrderId(Long workOrderId) {
+		this.workOrderId = workOrderId;
+	}
+
+	public CommodityDTO getCommodity() {
+		return commodity;
+	}
+
+	public void setCommodity(CommodityDTO commodity) {
+		this.commodity = commodity;
 	}
 
 	public Long getExpiryDate() {
 		return expiryDate;
 	}
 
-	public void setExpiryDate(Long expiryDate) {
-		this.expiryDate = expiryDate;
+	public void setExpiryDate(Long endDate) {
+		this.expiryDate = endDate;
 	}
 
-	public String getSellBuyOption() {
-		return sellBuyOption;
+	public String getOption() {
+		return option;
 	}
 
-	public void setSellBuyOption(String sellBuyOption) {
-		this.sellBuyOption = sellBuyOption;
+	public void setOption(String option) {
+		this.option = option;
 	}
 
-	public Integer getQuantity() {
+	public int getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(Integer quantity) {
+	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
 
-	public Float getOrderAverageValue() {
+	public float getOrderAverageValue() {
 		return orderAverageValue;
 	}
 
-	public void setOrderAverageValue(Float orderAverageValue) {
+	public void setOrderAverageValue(float orderAverageValue) {
 		this.orderAverageValue = orderAverageValue;
 	}
 
-	public Float getOrderValue() {
+	public float getOrderValue() {
 		return orderValue;
 	}
 
-	public void setOrderValue(Float orderValue) {
-		this.orderValue = orderValue;
+	public void setOrderValue(float unitValue) {
+		this.orderValue = unitValue;
+	}
+
+	public float getLastSoldValue() {
+		return lastSoldValue;
+	}
+
+	public void setLastSoldValue(float lastSoldValue) {
+		this.lastSoldValue = lastSoldValue;
+	}
+
+	public int getLastSoldQuantity() {
+		return lastSoldQuantity;
+	}
+
+	public void setLastSoldQuantity(int lastSoldQuantity) {
+		this.lastSoldQuantity = lastSoldQuantity;
 	}
 
 }

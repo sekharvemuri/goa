@@ -9,7 +9,7 @@
 	    	<div class="row commodity-wrapper" ng-repeat="pastCommodity in group.orderData">
 	    		<div class="col-md-12 commodity">
 		    		<div class="commodity-value commodity-name">
-                        <span ng-bind="pastCommodity.comodity.comodityName"></span><br/>
+                        <span ng-bind="pastCommodity.commodity.name"></span><br/>
                         <span class="legend">Commodity</span>
                     </div>
 		    		<span class="delimiter">-</span>
@@ -33,7 +33,7 @@
                         <span class="legend">Quantity</span>
                     </div>
 		    		<span class="delimiter">-</span>
-		    		<div class="commodity-value commodity-option" ng-bind="pastCommodity.sellBuyOption"></div>
+		    		<div class="commodity-value commodity-option" ng-bind="pastCommodity.option"></div>
 		    	</div>
 	    	</div>
 	    </uib-accordion-group>

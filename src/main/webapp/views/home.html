@@ -22,7 +22,7 @@
             <div class="row commodity-wrapper" ng-repeat="pastCommodity in group.orderData">
                 <div class="col-md-12 commodity">
                     <div class="commodity-value commodity-name">
-                        <span ng-bind="pastCommodity.comodity.comodityName"></span><br/>
+                        <span ng-bind="pastCommodity.commodity.name"></span><br/>
                         <span class="legend">Commodity</span>
                     </div>
                     <span class="delimiter">-</span>
@@ -46,7 +46,7 @@
                         <span class="legend">Quantity</span>
                     </div>
                     <span class="delimiter">-</span>
-                    <div class="commodity-value commodity-option" ng-bind="pastCommodity.sellBuyOption"></div>
+                    <div class="commodity-value commodity-option" ng-bind="pastCommodity.option"></div>
                     <div class="commodity-value pointer">
                         <span class="glyphicon glyphicon-menu-hamburger" ng-click="editCommodity(grpIndex, $index)"></span>
                     </div>
@@ -96,8 +96,8 @@
                     <label for="dd-commodity">Select commodity:</label>
                 </div>
                 <div class="col-md-6">
-					<select class="form-control" id="dd-commodity" ng-model="commodity.comodity" 
-						ng-options="comm.comodityName for comm in commodities track by comm.comodityId"></select>
+					<select class="form-control" id="dd-commodity" ng-model="commodity.commodity" 
+						ng-options="comm.name for comm in commodities track by comm.id"></select>
                 </div>
             </div>
         </div>
@@ -107,16 +107,17 @@
                     <label for="exp-date">Expiry date:</label>
                 </div>
                 <div class="col-md-6 left">
-                    <!-- <input type="text" class="form-control left" uib-datepicker-popup="{{format}}" ng-model="commodity.expiryDate" is-open="status.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" id="exp-date"/>
+                    <input type="text" class="form-control left" uib-datepicker-popup="{{format}}" ng-model="commodity.expiryDate" is-open="status.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" id="exp-date"/>
                     <span class="input-group-btn left">
                         <button type="button" class="btn btn-default calendar-icon" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
-                    </span> -->
+                    </span>
 
-                    <select class="form-control" id="dd-commodity" ng-model="commodity.expiryDate">
+                    <!--<select class="form-control" id="dd-commodity" ng-model="commodity.expiryDate">
                         <option value="">- Select one -</option>
                         <option ng-repeat="expiryDate in expiryDates" value="{{expiryDate.expiryDate}}" ng-bind="formatDate(expiryDate.expiryDate)">
                         </option>
                     </select>
+					-->
                 </div>
             </div>
         </div>
@@ -165,8 +166,8 @@
                 </div>
                 <div class="col-md-6">
                     <div class="btn-group" id="transaction-type">
-                        <label class="btn btn-primary" ng-model="commodity.sellBuyOption" uib-btn-radio="'BUY'">Buy</label>
-                        <label class="btn btn-primary" ng-model="commodity.sellBuyOption" uib-btn-radio="'SELL'">Sell</label>
+                        <label class="btn btn-primary" ng-model="commodity.option" uib-btn-radio="'BUY'">Buy</label>
+                        <label class="btn btn-primary" ng-model="commodity.option" uib-btn-radio="'SELL'">Sell</label>
                     </div>
                 </div>
             </div>

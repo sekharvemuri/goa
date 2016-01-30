@@ -1,0 +1,13 @@
+Set PATH to %MY_SQL_HOME%/bin;
+
+1. Starting MySQL Server
+ 	- Open CMD
+ 	- mysqld (and hit enter)
+ 
+2. Starting MySQL command line connector
+	- Open CMD
+	- mysql -u root
+	
+3. show databases;
+
+4. use <dbName>;

@@ -34,7 +34,7 @@ app.controller("OrderController", ['$scope', '$location', 'OrderService', functi
 	$scope.getCommodityName = function(comodityId){
 		var commodityName = "";
 		for(var i=0; i< $scope.commodities.length; i++){
-			if($scope.commodities[i].comodityId == comodityId){
+			if($scope.commodities[i].id == comodityId){
 				commodityName = $scope.commodities[i].name;
 				break;
 			}

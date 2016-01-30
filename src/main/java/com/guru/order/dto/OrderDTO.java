@@ -7,10 +7,11 @@ public class OrderDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private List<GroupDTO> groups;
-	private List<ComodityDTO> comodities;
+	private List<CommodityDTO> commodities;
 	private List<ExpiryDateDTO> expiryDates;
 	private List<String> previousOrderTimes;
 	private String orderTime;
+	private List<OrderConfirmationDTO> executionsList;
 
 	public List<GroupDTO> getGroups() {
 		return groups;
@@ -20,12 +21,12 @@ public class OrderDTO implements Serializable {
 		this.groups = groups;
 	}
 
-	public List<ComodityDTO> getComodities() {
-		return comodities;
+	public List<CommodityDTO> getCommodities() {
+		return commodities;
 	}
 
-	public void setComodities(List<ComodityDTO> comodities) {
-		this.comodities = comodities;
+	public void setCommodities(List<CommodityDTO> comodities) {
+		this.commodities = comodities;
 	}
 
 	public List<ExpiryDateDTO> getExpiryDates() {
@@ -52,4 +53,12 @@ public class OrderDTO implements Serializable {
 		this.orderTime = orderTime;
 	}
 
+	public List<OrderConfirmationDTO> getExecutionsList() {
+		return executionsList;
+	}
+
+	public void setExecutionsList(List<OrderConfirmationDTO> executionsList) {
+		this.executionsList = executionsList;
+	}
+	
 }
