@@ -1,7 +1,7 @@
 app.service("UserService", ['$http', function($http){
 	var service = {
 		getUsers: function(){
-			return $http.get("rest/order/get").then(function(response){
+			return $http.get("scripts/services/UserService.js").then(function(response){
 				console.log("Getting users");
 				var users = [{
 					"userId": 1,

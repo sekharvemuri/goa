@@ -8,6 +8,22 @@ var app = angular.module("CommoditiesApp", ['ngRoute', 'ui.bootstrap'])
 					return GroupService.getGroupData();
 				}
 			}
+		}).when('/webHome', {
+			templateUrl: './views/webHome.html',
+			controller: 'WebHomeController',
+			resolve: {
+				groupData: function(GroupService){
+					return GroupService.getGroupDataNew();
+				}
+			}
+		}).when('/adhoc', {
+			templateUrl: './views/adhoc.html',
+			controller: 'AdhocController',
+			resolve: {
+				groupData: function(GroupService){
+					return GroupService.getGroupDataNew();
+				}
+			}
 		}).when('/placeOrder', {
 			templateUrl: './views/placeOrder.html',
 			controller: 'OrderController'
@@ -62,3 +78,18 @@ var app = angular.module("CommoditiesApp", ['ngRoute', 'ui.bootstrap'])
 			}
 		});
 	}]);
+
+jQuery(document).ready(function($){
+	//open the lateral panel
+	$('.cd-btn').on('click', function(event){
+		event.preventDefault();
+		$('.cd-panel').addClass('is-visible');
+	});
+	//close the lateral panel
+	$('.cd-panel').on('click', function(event){
+		if( $(event.target).is('.cd-panel') || $(event.target).is('.cd-panel-close') ) { 
+			$('.cd-panel').removeClass('is-visible');
+			event.preventDefault();
+		}
+	});
+});

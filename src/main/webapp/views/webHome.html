@@ -1,0 +1,68 @@
+<div ng-repeat="group in groups" class="groupWrapper">
+	<div class="row" ng-init="groupIndex = $index">
+		<div class="col-md-11" style="padding: 25px;">
+			<div class="bold">
+				<div>Group <span ng-bind="group.groupName"></span></div>
+				<div>
+					Users: <span ng-bind="group.users"></span>
+					(<span ng-bind="getUserCount(group.users)"></span>)
+				</div>
+			</div>
+			<table width=100%>
+				<thead>
+					<tr>
+						<th class="text-center" ng-repeat="columnHeading in columnHeadings" ng-bind="columnHeading"></th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr ng-repeat="order in group.orderData">
+						<td>
+							<select style="width: 100%;" ng-model="order.comodityId" ng-options="commodity.name as commodity.name for commodity in group.commodities"></select>
+						</td>
+						<td>
+							<select style="width: 100%;" ng-model="order.expiryDate" ng-options="expiryDate as expiryDate for expiryDate in getExpiryDates(order.comodityId)"></select>
+						</td>
+						<td class="text-center">
+							<div style="display: inline-block;" ng-bind="order.prevOrderValue"></div>
+						</td>
+						<td class="text-center">
+							<div style="display: inline-block;" ng-bind="order.prevSellDate"></div>
+						</td>
+						<td class="text-center">
+							<div style="display: inline-block;" ng-bind="order.prevSellQuantity"></div>
+						</td>
+						<td class="text-center editable-fields price-field">
+							<div style="display: inline-block;">
+								<input type="text" ng-keypress="formatPrice($event, order.orderPrice)" ng-model="order.orderPrice" style="width: 90%; margin: 0 auto;"/>
+							</div>
+						</td>
+						<td class="text-center editable-fields price-field">
+							<div style="display: inline-block;">
+								<input type="text" ng-keypress="formatNumber($event)" ng-model="order.buyQuantity" style="width: 90%; margin: 0 auto;" placeholder="Buy"/>
+							</div>
+						</td>
+						<td class="text-center editable-fields price-field">
+							<div style="display: inline-block;">
+								<input type="text" ng-keypress="formatNumber($event)" ng-model="order.sellQuantity" style="width: 90%; margin: 0 auto;" placeholder="Sell"/>
+							</div>
+						</td>
+						<td class="text-center">
+							<span ng-click="deleteCommodity(groupIndex, $index)" class="pointer">
+								<i class="glyphicon glyphicon-remove"></i>
+							</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="addrow-wrapper">
+				<button ng-click="addCommodity(groupIndex)" class="pointer btn btn-success">Add row</button>
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+</div>
+
+<div class="col-md-11">
+	<button class="btn btn-success" style="margin: 0 auto;" ng-click="postOrder()">Submit</button>
+</div>

@@ -8,44 +8,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/style.css">
     <!-- endbuild -->
   </head>
   <body ng-app="CommoditiesApp">
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
-    <header>
-    	<div class="col-md-11 header-wrapper" ng-controller="HeaderController">
-    		<div class="col-md-3">
-    			<button class="btn btn-info header-btn" ng-click="showGroups()">Groups</button>
-    		</div>
-    		<div class="col-md-3">
-    			<button class="btn btn-info header-btn" ng-click="showComodities()">Comodities</button>
-    		</div>
-    		<div class="col-md-3">
-    			<button class="btn btn-info header-btn" ng-click="showTypes()">Types</button>
-    		</div>
-    		<div class="col-md-3">
-    			<button class="btn btn-info header-btn" ng-click="showUsers()">Users</button>
-    		</div>
+    <div class="menu-button">
+    	<div class="cd-btn pointer">
+    		<i class="glyphicon glyphicon-list"></i>
     	</div>
-    	<div class="clear"></div>
-    </header>
+    </div>
+    
+    <div class="cd-panel from-left">
+    	<header class="cd-panel-header">
+			<div class="app-name">Guru order app</div>
+			<a href="#0" class="cd-panel-close">X</a>
+		</header>
+		<div class="cd-panel-container">
+			<div class="cd-panel-content" ng-controller="HeaderController">
+				<div class="menu-item bold">
+					<a href="" ng-click="showWebHome()">Home</a>
+				</div>
+				<div class="menu-item bold">
+					<a href="" ng-click="showGroups()">Groups</a>
+				</div>
+				<div class="menu-item bold">
+					<a href="" ng-click="showComodities()">Commodities</a>
+				</div>
+				<!-- <div class="menu-item bold">
+					<a href="" ng-click="showTypes()">Types</a>
+				</div> -->
+				<div class="menu-item bold">
+					<a href="" ng-click="showUsers()">Users</a>
+				</div>
+				<div class="menu-item bold">
+					<a href="" ng-click="showAdhocOrder()">Adhoc order</a>
+				</div>
+			</div>
+		</div>
+    </div>
 
     <!-- Dashboard Content -->
-    <div ng-view=""></div>
+    <div ng-view="" style="width: 95%; margin: 0 auto;"></div>
 
     <!-- build:js(.) scripts/vendor.js -->
     <!-- bower:js -->
         <!-- <script data-main="main" src="bower_components/requirejs/require.js"></script> -->
 
+		<script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
         <script type="text/javascript" src="bower_components/angular/angular.js"></script>
         <script type="text/javascript" src="bower_components/angular-route/angular-route.js"></script>
         <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap-tpls-0.14.3.js"></script>
 
         <script type="text/javascript" src="scripts/app.js"></script>
+        <script type="text/javascript" src="scripts/underscore.js"></script>
 
         <script type="text/javascript" src="scripts/controllers/HomeController.js"></script>
+        <script type="text/javascript" src="scripts/controllers/WebHomeController.js"></script>
+        <script type="text/javascript" src="scripts/controllers/AdhocController.js"></script>
         <script type="text/javascript" src="scripts/controllers/ModalController.js"></script>
         <script type="text/javascript" src="scripts/controllers/OrderController.js"></script>
         <script type="text/javascript" src="scripts/controllers/HeaderController.js"></script>

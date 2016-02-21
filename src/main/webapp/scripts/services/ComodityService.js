@@ -1,7 +1,7 @@
 app.service("ComodityService", ['$http', function($http){
 	var service = {
 		getComodities: function(){
-			return $http.get("rest/order/get").then(function(response){
+			return $http.get("scripts/services/UserService.js").then(function(response){
 				console.log("Getting comodities");
 				var comodities = [{
 					"comodityId": 1,
