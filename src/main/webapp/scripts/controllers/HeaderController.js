@@ -1,7 +1,7 @@
 app.controller("HeaderController", ['$scope', '$location', function($scope, $location){
 	$scope.showWebHome = function(){
 		$(".cd-panel-close").click();
-		$location.path("webHome");
+		$location.path("");
 	}
 	
 	$scope.showAdhocOrder = function(){

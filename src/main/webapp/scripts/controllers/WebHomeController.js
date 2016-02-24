@@ -53,8 +53,18 @@ app.controller("WebHomeController", ['$scope', 'groupData', '$location',
 					alert("Please enter sell quantity/buy quantity for "+ $scope.groups[i].orderData[j].comodityId +" in group "+$scope.groups[i].groupName);
 					return;
 				}
+				if($scope.groups[i].orderData[j].buyQuantity){
+					$scope.groups[i].orderData[j].option = "BUY"; 
+				}
+				if($scope.groups[i].orderData[j].sellQuantity){
+					$scope.groups[i].orderData[j].option = "SELL"; 
+				}
 			}
 		}
+		sessionStorage.setItem("orderData", JSON.stringify($scope.groups));
+		sessionStorage.setItem("commodityData", JSON.stringify($scope.commodities));
+		sessionStorage.setItem("groupData", JSON.stringify(groupData));
+		$location.path("placeOrder");
 	}
 	
 	$scope.formatNumber = function($event){

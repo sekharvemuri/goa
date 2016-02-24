@@ -9,27 +9,28 @@
 	    	<div class="row commodity-wrapper" ng-repeat="pastCommodity in group.orderData">
 	    		<div class="col-md-12 commodity">
 		    		<div class="commodity-value commodity-name">
-                        <span ng-bind="pastCommodity.commodity.name"></span><br/>
+                        <span ng-bind="pastCommodity.comodityId"></span><br/>
                         <span class="legend">Commodity</span>
                     </div>
 		    		<span class="delimiter">-</span>
 		    		<div class="commodity-value commodity-enddate">
-                        <span ng-bind="formatDate(pastCommodity.expiryDate)"></span><br/>
+                        <span ng-bind="pastCommodity.expiryDate"></span><br/>
                         <span class="legend">Exp. date</span>
                     </div>
 		    		<span class="delimiter">-</span>
 		    		<div class="commodity-value commodity-pastvalue">
-                        <span ng-bind="pastCommodity.orderAverageValue"></span><br/>
+                        <span ng-bind="pastCommodity.prevOrderValue"></span><br/>
                         <span class="legend">Last tx value</span>
                     </div>
 		    		<span class="delimiter">-</span>
 		    		<div class="commodity-value commodity-unitprice">
-                        <span ng-bind="pastCommodity.orderValue"></span><br/>
+                        <span ng-bind="pastCommodity.orderPrice"></span><br/>
                         <span class="legend">Unit value</span>
                     </div>
 		    		<span class="delimiter">-</span>
 		    		<div class="commodity-value commodity-quantity">
-                        <span ng-bind="pastCommodity.quantity"></span><br/>
+                        <span ng-bind="pastCommodity.buyQuantity" ng-if="pastCommodity.option == 'BUY'"></span>
+                        <span ng-bind="pastCommodity.sellQuantity" ng-if="pastCommodity.option == 'SELL'"></span><br/>
                         <span class="legend">Quantity</span>
                     </div>
 		    		<span class="delimiter">-</span>

@@ -1,6 +1,6 @@
 var app = angular.module("CommoditiesApp", ['ngRoute', 'ui.bootstrap'])
 	.config(['$routeProvider', function($routeProvider){
-		$routeProvider.when('/', {
+		$routeProvider.when('/home', {
 			templateUrl: './views/home.html',
 			controller: 'HomeController',
 			resolve: {
@@ -8,7 +8,7 @@ var app = angular.module("CommoditiesApp", ['ngRoute', 'ui.bootstrap'])
 					return GroupService.getGroupData();
 				}
 			}
-		}).when('/webHome', {
+		}).when('/', {
 			templateUrl: './views/webHome.html',
 			controller: 'WebHomeController',
 			resolve: {
