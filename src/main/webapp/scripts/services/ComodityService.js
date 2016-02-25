@@ -21,8 +21,45 @@ app.service("ComodityService", ['$http', function($http){
 				}, {
 					"comodityId": 6,
 					"comodityName": "Nickel"
+				}, {
+					"comodityId": 7,
+					"comodityName": "Lead1"
 				}];
 				return comodities;
+			}, function(error){
+				console.log("error::: ");
+			});
+		},
+		
+		getComodityFamilies: function(){
+			return $http.get("scripts/services/UserService.js").then(function(response){
+				var comodityFamilies = [{
+					"comodityFamilyId": 1,
+					"comodityFamilyName": "Zinc",
+					"comodities": "Zinc1, Zinc2, Zinc3",
+					"expiryDates": "Date1, Date2, Date3, Date 4"
+				}, {
+					"comodityFamilyId": 2,
+					"comodityFamilyName": "Copper",
+					"comodities": "Copper, Copper2, Copper3",
+					"expiryDates": "Date1, Date2, Date3, Date 4"
+				}, {
+					"comodityFamilyId": 3,
+					"comodityFamilyName":"Lead",
+					"comodities": "Lead1, Lead2, Lead3",
+					"expiryDates": "Date1, Date2, Date3, Date 4"
+				}, {
+					"comodityFamilyId": 4,
+					"comodityFamilyName":"Gold",
+					"comodities": "Gold1, Gold2, Gold3",
+					"expiryDates": "Date1, Date2, Date3, Date 4"
+				}, {
+					"comodityFamilyId": 5,
+					"comodityFamilyName":"Aluminium",
+					"comodities": "Gold1, Gold2, Gold3",
+					"expiryDates": "Date1, Date2, Date3, Date 4"
+				}];
+				return comodityFamilies;
 			}, function(error){
 				console.log("error::: ");
 			});

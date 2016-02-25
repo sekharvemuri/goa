@@ -43,6 +43,17 @@ var app = angular.module("CommoditiesApp", ['ngRoute', 'ui.bootstrap'])
 					return ComodityService.getComodities();
 				}
 			}
+		}).when('/comodityFamily', {
+			templateUrl: './views/comodityFamilies.html',
+			controller: 'ComodityFamilyController',
+			resolve: {
+				comodityFamilies: function(ComodityService){
+					return ComodityService.getComodityFamilies();
+				},
+				comodities: function(ComodityService){
+					return ComodityService.getComodities();
+				}
+			}
 		}).when('/types', {
 			templateUrl: './views/types.html',
 			controller: 'TypeController'

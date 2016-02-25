@@ -19,6 +19,11 @@ app.controller("HeaderController", ['$scope', '$location', function($scope, $loc
 		$location.path("comodities");
 	}
 	
+	$scope.showComodityFamilies = function(){
+		$(".cd-panel-close").click();
+		$location.path("comodityFamily");
+	}
+	
 	$scope.showTypes = function(){
 		$(".cd-panel-close").click();
 		$location.path("types");

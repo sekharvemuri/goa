@@ -1,0 +1,132 @@
+<div class="col-md-12 tab-container">
+	<table class="table" style="width: 75%;">
+		<tr>
+			<th>Id</th>
+			<th>Family name</th>
+			<th>Main interval</th>
+			<th>Sub interval1</th>
+			<th>Sub interval2</th>
+			<th>Sub interval3</th>
+			<th>Comodity name</th>
+			<th>Expiry date</th>
+			<th>Action</th>
+		</tr>
+		<tr ng-repeat="comodityFamily in comodityFamilies">
+			<td ng-bind="comodityFamily.comodityFamilyId"></td>
+			<td ng-bind="comodityFamily.comodityFamilyName"></td>
+			<td ng-bind="comodityFamily.mainInterval"></td>
+			<td ng-bind="comodityFamily.subInterval1"></td>
+			<td ng-bind="comodityFamily.subInterval2"></td>
+			<td ng-bind="comodityFamily.subInterval3"></td>
+			<td>
+				<div ng-repeat="comodity in getComodities(comodityFamily.comodities)" ng-bind="comodity"></div>
+			</td>
+			<td>
+				<div ng-repeat="expiryDate in getExpiryDates(comodityFamily.expiryDates)" ng-bind="expiryDate"></div>
+			</td>
+			<td>
+				<div class="pointer">
+                    <span class="glyphicon glyphicon-menu-hamburger" ng-click="editComodityFamily($index)"></span>
+                    <span class="glyphicon glyphicon-remove" ng-click="deleteComodityFamily($index)"></span>
+                </div>
+			</td>
+		</tr>
+	</table>
+	
+	<div class="btn btn-success" ng-click="addComodityFamily()">Add Comodity Family</div>
+</div>
+
+<script type="text/ng-template" id="comodityFamily-modal.html">
+    <div class="modal-header">
+        <h3 class="modal-title" ng-bind="heading"></h3>
+    </div>
+    <div class="modal-body">
+		<div class="row popup-row">
+            <div class="col-md-12">
+				<div class="row" style="margin-bottom: 10px;">
+                	<div class="col-md-6 text-right popup-label">
+                    	<label for="comodityFamily-name">ComodityFamily name:</label>
+                	</div>
+                	<div class="col-md-6">
+                    	<input type="text" class="form-control" id="comodityFamily-name" ng-model="comodityFamily.comodityFamilyName"/>
+                	</div>
+				</div>
+				
+				<div class="row" style="margin-bottom: 10px;">
+					<div class="col-md-6 text-right popup-label">
+                    	<label for="comodityFamily-name">Main interval:</label>
+                	</div>
+					<div class="col-md-6">
+                    	<input type="text" class="form-control" id="comodityFamily-name" ng-model="comodityFamily.mainInterval"/>
+                	</div>
+				</div>
+				
+				<div class="row" style="margin-bottom: 10px;">
+					<div class="col-md-6 text-right popup-label">
+                    	<label for="comodityFamily-name">Sub interval1:</label>
+                	</div>
+					<div class="col-md-6">
+                    	<input type="text" class="form-control" id="comodityFamily-name" ng-model="comodityFamily.subInterval1"/>
+                	</div>
+				</div>
+
+				<div class="row" style="margin-bottom: 10px;">
+					<div class="col-md-6 text-right popup-label">
+                    	<label for="comodityFamily-name">Sub interval2:</label>
+                	</div>
+					<div class="col-md-6">
+                    	<input type="text" class="form-control" id="comodityFamily-name" ng-model="comodityFamily.subInterval2"/>
+                	</div>
+				</div>
+
+				<div class="row" style="margin-bottom: 10px;">
+					<div class="col-md-6 text-right popup-label">
+                    	<label for="comodityFamily-name">Sub interval3:</label>
+                	</div>
+					<div class="col-md-6">
+                    	<input type="text" class="form-control" id="comodityFamily-name" ng-model="comodityFamily.subInterval3"/>
+                	</div>
+				</div>
+
+				<div class="row" style="margin-bottom: 10px;">
+					<div class="col-md-5">
+                    	<select size=5 style="width: 100%; height: 75px;" ng-model="selectedComodity">
+							<option ng-repeat="comm in leftComodities" value="{{comm}}" ng-bind="comm"></option>
+						</select>
+                	</div>
+					<div class="col-md-1">
+						<div style="margin-bottom: 10px;">
+                    		<button ng-click="addComodity()">></button>
+						</div>
+						<br/>
+						<div style="margin-bottom: 10px;">
+                    		<button ng-click="removeComodity()"><</button>
+						</div>
+                	</div>
+					<div class="col-md-5">
+                    	<select size=5 style="width: 100%; height: 75px;" ng-model="selectedComodityToDel">
+							<option ng-repeat="comm in rightComodities" value="{{comm}}" ng-bind="comm"></option>
+						</select>
+                	</div>
+				</div>
+				
+				<div class="row" style="margin-bottom: 10px;">
+					<div class="col-md-6 text-right popup-label">
+                    	<label for="comodityFamily-name">Expiry date:</label>
+                	</div>
+					<div class="col-md-6">
+                    	<input type="text" class="form-control" id="comodityFamily-name" ng-model="expiryDate" ng-keypress="addValue($event)"/>
+						<br/>
+						<select multiple style="width: 100%; height: 75px;">
+							<option ng-repeat="expiryDate in expiryDates" value="{{expiryDate}}" ng-bind="expiryDate"></option>
+						</select>
+                	</div>
+				</div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">Save</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+    </div>
+</script>
