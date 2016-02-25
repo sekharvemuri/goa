@@ -213,6 +213,7 @@ create table group_candidates (
 
 insert into group_candidates (group_id, cand_id) values ((select id from groups where NAME='Group A A'), 69641);
 insert into group_candidates (group_id, cand_id) values ((select id from groups where NAME='Group A'), 90178);
+insert into group_candidates (group_id, cand_id) values ((select id from groups where NAME='Group B'), 90181);
 insert into group_candidates (group_id, cand_id) values ((select id from groups where NAME='Group C'), 90177);
 insert into group_candidates (group_id, cand_id) values ((select id from groups where NAME='Group D'), 90125);
 insert into group_candidates (group_id, cand_id) values ((select id from groups where NAME='Group D'), 90138);
@@ -289,14 +290,17 @@ insert into group_candidates (group_id, cand_id) values ((select id from groups 
 
 create table work_order (
 	id int primary key auto_increment, 
-	GROUP_ID int references GROUPS.ID,
-	CMDTY_ID int references COMMODITY.ID,
+	group_id int references GROUPS.ID,
+	cmdty_id int references COMMODITY.ID,
 	order_type varchar(10),
 	candidate_id int,
+	prev_sell_price decimal(9, 2),
+	prev_sell_date timestamp,
+	prev_sell_qty int,
 	order_quantity int,
 	order_amount decimal(9,2), 
 	order_time timestamp,
-	expiry_date timestamp,
+	expiry_date date,
 	executed_amount decimal(9,2), 
 	executed_quantity int,
 	executed_time timestamp null
@@ -304,8 +308,11 @@ create table work_order (
 
 create table next_work_order (
 	id int primary key, 
-	GROUP_ID int,
-	CMDTY_ID int,
+	group_id int,
+	cmdty_id int,
+	prev_sell_price decimal(9, 2),
+	prev_sell_date timestamp,
+	prev_sell_qty int,
 	order_type varchar(10),
 	candidate_id int,
 	order_quantity int,
@@ -316,8 +323,11 @@ create table next_work_order (
 
 create table previous_work_order (
 	id int primary key, 
-	GROUP_ID int,
-	CMDTY_ID int,
+	group_id int,
+	cmdty_id int,
+	prev_sell_price decimal(9, 2),
+	prev_sell_date timestamp,
+	prev_sell_qty int,
 	order_type varchar(10),
 	candidate_id int,
 	order_quantity int,

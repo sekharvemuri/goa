@@ -27,9 +27,6 @@
 		<listener-class>org.jboss.resteasy.plugins.spring.SpringContextLoaderListener
 		</listener-class>
 	</listener>
-	<listener>
-		<listner-class>com.guru.order.app.application.DataLoadListener</listner-class>
-	</listener>
 	<servlet>
 		<servlet-name>resteasy-servlet</servlet-name>
 		<servlet-class>
@@ -40,18 +37,8 @@
 			<param-value>com.guru.order.app.application.GuruOrderApplication</param-value>
 		</init-param>
 	</servlet>
-	<servlet>
-		<servlet-name>loadServlet</servlet-name>
-		<servlet-class>com.guru.order.app.application.LoadServlet
-		</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
 	<servlet-mapping>
 		<servlet-name>resteasy-servlet</servlet-name>
 		<url-pattern>/rest/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>loadServlet</servlet-name>
-		<url-pattern>/loadServlet</url-pattern>
 	</servlet-mapping>
 </web-app>

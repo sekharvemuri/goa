@@ -3,14 +3,20 @@ package com.guru.order.data.vo;
 import java.io.Serializable;
 import java.util.Calendar;
 
+import com.guru.order.utils.DateUtils;
+
 public class WorkOrderVO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Long id;
+	private Long groupId;
 	private String groupName;
 	private Long candidateId;
 	private int commodityId;
 	private String commodityName;
+	private Float previousSellPrice;
+	private Calendar previousSellDate;
+	private int previousSellQty;
 	private String orderType;
 	private Float orderAmount;
 	private int orderQuantity;
@@ -26,6 +32,14 @@ public class WorkOrderVO implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public Long getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(Long groupId) {
+		this.groupId = groupId;
 	}
 
 	public String getGroupName() {
@@ -58,6 +72,30 @@ public class WorkOrderVO implements Serializable {
 
 	public void setCommodityName(String commodityName) {
 		this.commodityName = commodityName;
+	}
+
+	public Float getPreviousSellPrice() {
+		return previousSellPrice;
+	}
+
+	public void setPreviousSellPrice(Float previousSellPrice) {
+		this.previousSellPrice = previousSellPrice;
+	}
+
+	public Calendar getPreviousSellDate() {
+		return previousSellDate;
+	}
+
+	public void setPreviousSellDate(Calendar previousSellDate) {
+		this.previousSellDate = previousSellDate;
+	}
+
+	public int getPreviousSellQty() {
+		return previousSellQty;
+	}
+
+	public void setPreviousSellQty(int previousSellQty) {
+		this.previousSellQty = previousSellQty;
 	}
 
 	public String getOrderType() {
@@ -124,4 +162,9 @@ public class WorkOrderVO implements Serializable {
 		this.executedTime = executedTime;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("Saving GrupName:%s, Commodity:%s, Candidate:%s, OrderType:%s, OrderQuantity:%s, orderAmount:%s, OrderTime:%s, ExpiryTime:%s",
+				getGroupName(), getCommodityName(), getCandidateId(), getOrderType(), getOrderQuantity(), getOrderAmount(), DateUtils.getSqlTimeStamp(getOrderTime()), DateUtils.getSqlTimeStamp(getExpiryDate()));
+	}
 }

@@ -23,6 +23,7 @@ import com.guru.order.data.vo.RecentExecutionVO;
 import com.guru.order.data.vo.WorkOrderVO;
 import com.guru.order.dto.OrderConfirmationDTO;
 import com.guru.order.utils.CollectionUtils;
+import com.guru.order.utils.Constants;
 import com.guru.order.utils.DateUtils;
 
 @Component
@@ -62,6 +63,12 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 					});
 		}
 	}
+	
+	@Override
+	public void saveWorkOrders(WorkOrderVO vo) {
+		getJdbcTemplate().update(INSERT_SQL, new Object[]{vo.getGroupName(), vo.getCommodityName(), vo.getOrderType(), vo.getCandidateId(), 
+				vo.getOrderQuantity(), vo.getOrderAmount(), DateUtils.getSqlTimeStamp(vo.getOrderTime()), DateUtils.getSqlTimeStamp(vo.getExpiryDate())});
+	}
 
 	@Override
 	public Calendar getRecentOrderTime(String orderType) {
@@ -87,7 +94,7 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 				+ " wo.id as workOrderId, wo.order_quantity as orderQuantity, wo.order_time as orderTime, wo.order_type as orderType, wo.expiry_date expiryDate "
 				+ " from groups g, commodity c, work_order wo where g.id=wo.group_id and c.id = wo.cmdty_id and wo.executed_amount is null "
 				+ " and wo.order_type = ? "
-				+ " group by wo.group_id, wo.cmdty_id";
+				+ " group by wo.group_id, wo.cmdty_id, wo.order_time";
 		
 //		String query = "select s.group_name as groupName, s.symbol_name as commodityName, c.id as commodityId, avg(s.order_amount) as orderAmount, s.order_quantity as orderQuantity,"
 //				+ " s.order_time as orderTime, s.order_type as orderType, s.expiry_date as expiryDate"
@@ -111,7 +118,9 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 						vo.setOrderQuantity(rs.getInt("orderQuantity"));
 						vo.setOrderTime(DateUtils.getCalendar(rs.getTimestamp("orderTime")));
 						vo.setOrderType(rs.getString("orderType"));
-						vo.setExpiryDate(DateUtils.getCalendar(rs.getTimestamp("expiryDate")));
+						Calendar expiryDateCal = DateUtils.getCalendar(rs.getTimestamp("expiryDate"));
+						DateUtils.trimToDate(expiryDateCal);
+						vo.setExpiryDate(expiryDateCal);
 						list.add(vo);
 					}
 				}
@@ -226,8 +235,26 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 	}
 	
 	@Override
-	public void saveOrderConfirmation(final List<OrderConfirmationDTO> list) {
-		if (CollectionUtils.isNotEmpty(list)) {
+	public void saveOrderConfirmation(final Map<Long, Map<String, List<OrderConfirmationDTO>>> map) {
+		if (map == null) {
+			return;
+		}
+		
+		for (Long candidateId : map.keySet()) {
+			Map<String, List<OrderConfirmationDTO>> orderTypeMap = map.get(candidateId);
+			if (orderTypeMap != null) {
+				for (String orderType : orderTypeMap.keySet()) {
+					if (Constants.BUY_SELL_OPTION.BUY.toString().equalsIgnoreCase(orderType)) {
+						//saveBuyOrderConfirmations(orderTypeMap.get(orderType));
+					}
+					else {
+						//saveSellOrderConfirmations(orderTypeMap.get(orderType));
+					}
+				}
+			}
+		}
+		
+		/*if (CollectionUtils.isNotEmpty(list)) {
 			String query = "update work_order set executed_amount=?, executed_quantity=?, executed_time=? where candidate_id=? and cmdty_id=(select id from commodity where name=?) and order_type=?";
 			final Timestamp executedTime = DateUtils.getSqlTimeStamp(Calendar.getInstance());
 			getJdbcTemplate().batchUpdate(query,
@@ -251,7 +278,7 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 						}
 				
 			});
-		}
+		}*/
 	}
 
 	@Override
@@ -283,4 +310,53 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 		}
 	}
 
+	@Override
+	public void saveTradedOrders(final List<OrderConfirmationDTO> list, int groupId, String groupName) {
+		final Calendar executedTime = Calendar.getInstance();
+		String query = "update work_order set executed_amount=?, executed_quantity=?, executed_time=? "
+				+ " where candidate_id=? "
+				+ " and cmdty_id=(select id from commodity where name=?) "
+				+ " and DATE_FORMAT(expiry_Date, '%e-%m-%Y')=? "
+				+ " and order_type=?";
+		
+		for (OrderConfirmationDTO dto : list) {
+//			System.out.println("In Loop - CandidateId:" + dto.getCandidateId() + " - Symbol:" + dto.getCommodityName()
+//					+ " - ExpiryDate:" + DateUtils.formatToDDMMYYYY(dto.getExpirtyDate().getTime()) + " - OrderType:" + dto.getBuySellIndicator()
+//					+ " - Quantity:" + dto.getTradeQuantity() + " - Price:" + dto.getUnitPrice() + " - " + groupName);
+			
+			String str = String.format("update work_order set executed_amount=%s, executed_quantity=%s, executed_time='%s' "
+					+ " where candidate_id=%s "
+					+ " and cmdty_id=(select id from commodity where name='%s') "
+					+ " and DATE_FORMAT(expiry_Date, )='%s' "
+					+ " and order_type='%s'", dto.getUnitPrice(), dto.getTradeQuantity(), DateUtils.getSqlTimeStamp(executedTime),
+					dto.getCandidateId(), dto.getCommodityName(), DateUtils.formatToDDMMYYYY(dto.getExpirtyDate().getTime()),
+					dto.getBuySellIndicator(), dto.getTradeQuantity(), dto.getUnitPrice());
+			System.out.println(str);
+			
+			Object[] params = new Object[] {dto.getUnitPrice(), dto.getTradeQuantity(), DateUtils.getSqlTimeStamp(executedTime), 
+					dto.getCandidateId(), dto.getCommodityName(), DateUtils.formatToDDMMYYYY(dto.getExpirtyDate()), dto.getBuySellIndicator().toUpperCase()};
+			getJdbcTemplate().update(query, params);
+		}
+		
+//		getJdbcTemplate().batchUpdate(query, new BatchPreparedStatementSetter() {
+//			
+//			@Override
+//			public void setValues(PreparedStatement ps, int i) throws SQLException {
+//				OrderConfirmationDTO dto = list.get(i);
+//				ps.setFloat(1, dto.getUnitPrice());
+//				ps.setInt(2, dto.getTradeQuantity());
+//				ps.setTimestamp(3, DateUtils.getSqlTimeStamp(executedTime));
+//				ps.setLong(4, dto.getCandidateId());
+//				ps.setString(5, dto.getCommodityName());
+//				ps.setString(6, DateUtils.formatToDDMMYYYY(dto.getExpirtyDate()));
+//				ps.setString(7, dto.getBuySellIndicator().toUpperCase());
+//			}
+//			
+//			@Override
+//			public int getBatchSize() {
+//				return list.size();
+//			}
+//		});
+	}
+	
 }

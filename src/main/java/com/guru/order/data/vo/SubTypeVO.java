@@ -9,7 +9,24 @@ public class SubTypeVO implements Serializable {
 	private int typeId;
 	private String name;
 	private String description;
+	
+	public SubTypeVO() {
+		super();
+	}
 
+	public SubTypeVO(int id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
+
+	public SubTypeVO(int id, String name, int typeId) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.typeId = typeId;
+	}
+	
 	public int getId() {
 		return id;
 	}

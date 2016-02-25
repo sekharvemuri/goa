@@ -11,6 +11,9 @@
 
 	<context:annotation-config />
 	<context:component-scan base-package="com.guru.order" />
+	
+	<!-- <context:property-placeholder location="file:/goa/etc/order-app.properties"/> -->
+	<context:property-placeholder location="classpath:metadata.properties"/>
 
 	<!-- <import resource="spring-data.xml" /> -->
 
@@ -18,7 +21,7 @@
 		<property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
 		<property name="url" value="jdbc:mysql://localhost:3306/goadb"></property>
 		<property name="username" value="root" />
-		<property name="password" value="admin" />
+		<property name="password" value="" />
 		<property name="initialSize" value="2" />
 		<property name="maxActive" value="5" />
 	</bean>
@@ -45,6 +48,9 @@
 			</props>
 		</property>
 	</bean>
-
+	
+	<bean id="goaProperties" class="com.guru.order.service.GoaProperties">
+		<property name="sendMail" value="${mailflag}"></property>
+	</bean>
 
 </beans>

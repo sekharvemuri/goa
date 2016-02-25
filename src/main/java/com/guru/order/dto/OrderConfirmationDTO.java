@@ -3,6 +3,10 @@ package com.guru.order.dto;
 import java.io.Serializable;
 import java.util.Calendar;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
+import com.guru.order.utils.DateUtils;
+
 public class OrderConfirmationDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -104,6 +108,23 @@ public class OrderConfirmationDTO implements Serializable {
 
 	public void setExpirtyDate(Calendar expirtyDate) {
 		this.expirtyDate = expirtyDate;
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(candidateId).append(commodityName)
+				.append(expirtyDate).append(buySellIndicator)
+				.append(tradeQuantity).append(unitPrice).hashCode();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sBuilder = new StringBuilder("");
+		sBuilder.append(candidateId).append(commodityName)
+				.append(DateUtils.formatToDDMMYYYY(expirtyDate))
+				.append(buySellIndicator).append(tradeQuantity)
+				.append(unitPrice);
+		return sBuilder.toString();
 	}
 
 }

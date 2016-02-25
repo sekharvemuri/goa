@@ -10,6 +10,16 @@ public class TypeVO implements Serializable {
 	private String name;
 	private String description;
 	private List<SubTypeVO> subTypes;
+	
+	public TypeVO() {
+		super();
+	}
+
+	public TypeVO(int id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
 
 	public int getId() {
 		return id;

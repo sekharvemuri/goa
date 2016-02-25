@@ -16,6 +16,11 @@ public class GroupVO implements Serializable {
 		super();
 	}
 
+	public GroupVO(String name) {
+		super();
+		this.name = name;
+	}
+	
 	public GroupVO(int id, String name) {
 		super();
 		this.id = id;

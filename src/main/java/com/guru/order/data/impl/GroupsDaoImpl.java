@@ -3,10 +3,13 @@ package com.guru.order.data.impl;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -23,9 +26,16 @@ import com.guru.order.data.vo.GroupVO;
 @Component
 public class GroupsDaoImpl extends BaseDao implements GroupsDao {
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public List<GroupVO> getGroups() {
+		String query = "select id, name from groups order by name";
+		return ((List<GroupVO>) getJdbcTemplate().query(query, new BeanPropertyRowMapper(GroupVO.class)));
+	}
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public List<GroupVO> getAllGroups() {
+	public List<GroupVO> getGroupsWithCandidates() {
 		String query = "select id, name from groups g, group_candidates gc where g.id=gc.group_id group by id, name";
 		return ((List<GroupVO>) getJdbcTemplate().query(query, new BeanPropertyRowMapper(GroupVO.class)));
 	}
@@ -33,7 +43,11 @@ public class GroupsDaoImpl extends BaseDao implements GroupsDao {
 	@Override
 	public void addGroup(GroupVO group) {
 		String query = "insert into groups (name) values (?)";
-		getJdbcTemplate().update(query, new Object[] {group.getName()});
+		try {
+			getJdbcTemplate().update(query, new Object[] {group.getName()});
+		} catch (Exception e) {
+			System.out.println(String.format("Group already exists : %s", group.getName()));
+		}
 	}
 
 	@Override
@@ -123,6 +137,85 @@ public class GroupsDaoImpl extends BaseDao implements GroupsDao {
 			}
 		});
 	}
-	
-	
+
+	@Override
+	public void saveGroupCandidates(Map<String, List<String>> groupCandidatesMap) {
+		if (groupCandidatesMap == null || groupCandidatesMap.isEmpty()) {
+			return;
+		}
+		
+		Set<String> groupNameSet = groupCandidatesMap.keySet();
+		Set<String> candidatesSet = new HashSet<String>();
+		
+		for (String groupName : groupNameSet) {
+			List<String> candidatesList = groupCandidatesMap.get(groupName);
+			candidatesSet.addAll(candidatesList);
+		}
+		
+		// get groups available from DB
+		//List<String> dbGroupNames = this.getGroupNames();
+		
+		// remove the db names from request names.
+		//Set<String> nonDbGroups = CollectionUtil
+		//groupNameSet.removeAll(dbGroupNames);
+
+		// save what ever left, means, not exist in db.
+		for (String groupName : groupNameSet) {
+			this.addGroup(new GroupVO(groupName));
+		}
+		
+		//List<String> dbCandidates = getCandidates();
+		//candidatesSet.removeAll(dbCandidates);
+		addCandidates(new ArrayList<String>(candidatesSet));
+		
+		groupNameSet = groupCandidatesMap.keySet();
+		String query = "insert into group_candidates (group_id, cand_id) values ((select id from groups where NAME=?), ?)";
+		for (String groupName : groupNameSet) {
+			List<String> candidatesList = groupCandidatesMap.get(groupName);
+			for (String candId : candidatesList) {
+				try {
+					getJdbcTemplate().update(query, new Object[] {groupName, Long.valueOf(candId)});
+				} catch (Exception e) {
+					System.out.println(String.format("Exception while inserting Group-Candidate(%s, %s)", groupName, candId));
+				}
+			}
+		}
+	}
+
+	private void addCandidates(final List<String> candidateSet) {
+		String query = "insert into candidates (id) values (?)";
+		for (String candId : candidateSet) {
+			try {
+				getJdbcTemplate().update(query, new Object[] {Long.valueOf(candId)});
+			} catch (Exception e) {
+				System.out.println(String.format("Candidate already exists : %s", candId));
+			}
+		}
+	}
+
+	@Override
+	public void saveGroupCommodity(String groupName, String commodityName) {
+		String query = "insert group_commodity (group_id, cmdty_id) values ((select id from groups where NAME=?), (select id from commodity where NAME=?))";
+		try {
+			getJdbcTemplate().update(query, new Object[] {groupName, commodityName});
+		} catch (Exception e) {
+			System.out.println(String.format("Group-Commodity already exists : %s, %s", groupName, commodityName));
+		}
+	}
+
+	@Override
+	public void saveCommodity(String commodityName) {
+		String query = "insert into commodity (NAME) values (?)";
+		try {
+			getJdbcTemplate().update(query, new Object[] {commodityName});
+		} catch (Exception e) {
+			System.out.println(String.format("Commodity already exists : %s", commodityName));
+		}
+	}
+
+	@Override
+	public List<Long> getCandidatesByGroupName(String groupName) {
+		String query = "select c.id from candidates c, group_candidates gc, groups g where gc.group_id=g.id and c.id=gc.cand_id and g.name='" + groupName + "' ";
+		return getJdbcTemplate().queryForList(query, Long.class);
+	}
 }

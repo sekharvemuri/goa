@@ -1,6 +1,9 @@
 package com.guru.order.dto;
 
 import java.io.Serializable;
+import java.util.Calendar;
+
+import com.guru.order.utils.DateUtils;
 
 public class OrderData implements Serializable {
 
@@ -33,6 +36,10 @@ public class OrderData implements Serializable {
 
 	public Long getExpiryDate() {
 		return expiryDate;
+	}
+	
+	public Calendar getExpiryDateAsDate() {
+		return DateUtils.getCalendar(this.getExpiryDate());
 	}
 
 	public void setExpiryDate(Long endDate) {

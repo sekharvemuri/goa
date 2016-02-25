@@ -1,6 +1,8 @@
 package com.guru.order.utils;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class StringUtils {
 
@@ -21,4 +23,20 @@ public class StringUtils {
 		return result;
 	}
 	
+	public static String trim(String str) {
+		return (str == null) ? null : str.trim();
+	}
+	
+	public static List<String> toList(String str) {
+		List<String> list = new ArrayList<String>();
+		String[] array = str.split(",");
+		for (String s : array) {
+			list.add(s.trim());
+		}
+		return list;
+	}
+
+	public static String toUpperCase(String string) {
+		return (string == null) ? null : string.toUpperCase();
+	}
 }

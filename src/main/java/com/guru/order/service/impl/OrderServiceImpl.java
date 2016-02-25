@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,6 +30,7 @@ import com.guru.order.dto.OrderConfirmationDTO;
 import com.guru.order.dto.OrderDTO;
 import com.guru.order.dto.OrderData;
 import com.guru.order.service.CommodityService;
+import com.guru.order.service.GoaProperties;
 import com.guru.order.service.OrderService;
 import com.guru.order.service.csv.CsvGenerator;
 import com.guru.order.service.csv.CsvUtils;
@@ -34,6 +38,7 @@ import com.guru.order.service.excel.PriceWorkSheetGenerator;
 import com.guru.order.service.mail.MailHelper;
 import com.guru.order.utils.CollectionUtils;
 import com.guru.order.utils.Constants;
+import com.guru.order.utils.DateUtils;
 import com.guru.order.utils.StringUtils;
 
 @Component
@@ -53,10 +58,13 @@ public class OrderServiceImpl implements OrderService {
 	private PriceWorkSheetGenerator priceWorkSheetGenerator;
 	@Autowired
 	private MailHelper mailHelper;
+	@Autowired
+	private GoaProperties goaProperties;
 
 	public OrderDTO getNewOrder() {
+		System.out.println("SendMail:" + goaProperties.sendMail);
 		List<GroupDTO> groupDTOsList = new ArrayList<GroupDTO>();
-		List<GroupVO> groupsList = groupsDao.getAllGroups();
+		List<GroupVO> groupsList = groupsDao.getGroupsWithCandidates();
 		for (GroupVO groupVo : groupsList) {
 			getGroupDtoByGroupName(groupVo.getName(), groupDTOsList);
 		}
@@ -209,33 +217,121 @@ public class OrderServiceImpl implements OrderService {
 			this.workOrderDao.saveWorkOrders(voList);
 		}
 	}
-
+	
 	@Override
 	public void saveOrderConfirmation(Reader reader) throws Exception {
-		List<OrderConfirmationDTO> list = csvUtils.getExecutionsList(reader);
-		workOrderDao.saveOrderConfirmation(list);
+		// convert the Reader to List of OrderConfirmationDTO
+		List<OrderConfirmationDTO> tradesList = csvUtils.getExecutionsList(reader);
+		
+		// get the NewOrder from DB
+		OrderDTO orderDto = getNewOrder();
+		
+		// for each Group in NewOrder iterate through each symbol & order type 
+		// check for each candidate exists in the confirmation list or not ?
+		List<GroupDTO> groupDtosList = orderDto.getGroups();
+		for (GroupDTO groupDto : groupDtosList) {
+			// get users list from group
+			String usersStr = groupDto.getUsers();
+			String[] users = usersStr.split(",");
+			
+			// get all orders based 
+			List<OrderData> ordersList = groupDto.getOrderData();
+			for (OrderData orderData : ordersList) {
+				String commodityName = orderData.getCommodity().getName();
+				String orderType = orderData.getOption();
+				Map<String, List<OrderConfirmationDTO>> confirmOrdersMap = getTradedCandidates(tradesList, usersStr, commodityName, orderType, orderData.getExpiryDateAsDate());
+				if (confirmOrdersMap.size() > 0) {
+					Set<String> keySet = confirmOrdersMap.keySet();
+					if (confirmOrdersMap.size() == 1) {
+						String key = keySet.iterator().next();
+						List<OrderConfirmationDTO> confirmOrdersList = confirmOrdersMap.get(key);
+						if (users.length == confirmOrdersList.size()) {
+							workOrderDao.saveTradedOrders(confirmOrdersList, groupDto.getGroupId(), groupDto.getGroupName());
+							tradesList.removeAll(confirmOrdersList);
+						}
+					} else {
+						// not happy path
+						// example: multiple BUYs per group, symbol & expiry date
+					}
+				}
+			}
+			
+		}
 	}
 
-	@Override
-	public List<GroupDTO> getCurrentOrders() {
-		List<GroupDTO> groupDTOsList = new ArrayList<GroupDTO>();
-		List<WorkOrderVO> sellOrders = workOrderDao.getOrders(Constants.BUY_SELL_OPTION.SELL.getOptionType());
-		List<WorkOrderVO> buyOrders = workOrderDao.getOrders(Constants.BUY_SELL_OPTION.BUY.getOptionType());
-		parseIntoGroupDTO(sellOrders, groupDTOsList);
-		parseIntoGroupDTO(buyOrders, groupDTOsList);
-		mergeGroupsWithCommodities(groupDTOsList);
-		sortOrderData(groupDTOsList);
-		return groupDTOsList;
-	}
+//	@Override
+//	public void saveOrderConfirmation(Reader reader) throws Exception {
+//		List<OrderConfirmationDTO> list = csvUtils.getExecutionsList(reader);
+//		Map<String, Map<Long, List<OrderConfirmationDTO>>> map = parseInToOrderTypeAndCandidate(list);
+//		OrderDTO orderDto = getNewOrder();
+//		
+//		//Process SELL orders first
+//		Map<Long, List<OrderConfirmationDTO>> sellOrdersMap = map.get("SELL");
+//		for (Long candidateId : sellOrdersMap.keySet()) {
+//			List<OrderConfirmationDTO> ordersList = sellOrdersMap.get(candidateId);
+//			ordersList = sortOrdersByPrice(ordersList, "asc");
+//			
+//			for (OrderConfirmationDTO dto : ordersList) {
+//				List<String> groupNamesLst = getGroupsContainsOrder(orderDto.getGroups(), dto);
+//				
+//				// get each group and check for other users also have the same confirm order or not.
+//				// get the sub list from OrderDTO (new order).
+//				// because in first group there is a chance of existing single user that contain similar order
+//				
+//			}
+//		}
+//		
+//		//Map<Long, Map<String, List<OrderConfirmationDTO>>> map = parseInToCandidateAndOrderType(list);
+//	
+//		/*
+//		 * (120, Lead Mini, SELL, 60156, Group A)
+//		 * (120, Lead Mini, SELL, 60156, Group B)
+//		 * 
+//		 * symbol wise, candidates, 
+//		 * 
+//		 Map<candidateID, Map<orderType, List<VO>>>
+//		 
+//		 each candidate can have multiple SELL, BUY orders.
+//		 
+//		 SELL orders - 1st lowest order will get executes.
+//		 for (SELL orders) {
+//		   get each vo (100, Lead Mini, SELL, 60156, Group A)
+//		   get list of records with candidateId, orderType, commodity from DB where executed price is NULL, in order price ascending order //for SELL
+//		   get 1st db record (100, Lead Mini, SELL, 60156, 101, )
+//		   update DB
+//		   
+//		 }
+//		 
+//		 
+//		 Question : if both groups have same order price and only if one of the order executed
+//		 Solution : 
+//		 
+//		 * */
+//		
+//		workOrderDao.saveOrderConfirmation(map);
+//	}
 
-	@Override
-	public void saveExecutedOrderByGroupName(List<OrderConfirmationDTO> executionsList) {
-		List<OrderConfirmationDTO> list = new ArrayList<OrderConfirmationDTO>();
-		for (OrderConfirmationDTO executedOrder : executionsList) {
-			if (executedOrder.getUnitPrice() != null) {
-				list.add(executedOrder);
+	private Map<String, List<OrderConfirmationDTO>> getTradedCandidates(
+			List<OrderConfirmationDTO> tradesList, String users, String commodityName, String orderType, Calendar expiryDate) {
+		Map<String, List<OrderConfirmationDTO>> map = new HashMap<String, List<OrderConfirmationDTO>>();
+		List<OrderConfirmationDTO> list = null;
+		String orderExpiryDateStr = DateUtils.formatToDDMMYYYY(expiryDate);
+		for (OrderConfirmationDTO dto : tradesList) {
+			String tradedCandId = String.valueOf(dto.getCandidateId());
+			if (users.contains(tradedCandId) && commodityName.equalsIgnoreCase(dto.getCommodityName()) && orderType.equalsIgnoreCase(dto.getBuySellIndicator())) {
+				String tradeExpiryDateStr = DateUtils.formatToDDMMYYYY(dto.getExpirtyDate());
+				if(orderExpiryDateStr.equalsIgnoreCase(tradeExpiryDateStr)) {
+					String key = DateUtils.formatToDDMMYYYY(expiryDate.getTime());// + "," + dto.getUnitPrice();
+					list = map.get(key);
+					if (list == null) {
+						list = new ArrayList<OrderConfirmationDTO>();
+						map.put(key, list);
+					}
+					list.add(dto);
+				}
 			}
 		}
-		workOrderDao.saveExecutedOrderByGroupName(list);
+		return map;
 	}
+
 }
