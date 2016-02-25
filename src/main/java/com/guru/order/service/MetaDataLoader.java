@@ -13,6 +13,11 @@ import com.guru.order.dto.CommodityDTO;
 import com.guru.order.dto.ExpiryDateDTO;
 import com.guru.order.dto.GroupDTO;
 
+/**
+ * Loads data from Properties File
+ * @author pavan
+ *
+ */
 public class MetaDataLoader {
 	
 	public static String GROUPS = "GROUPS";

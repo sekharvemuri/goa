@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.guru.order.dto.OrderConfirmationDTO;
 import com.guru.order.utils.DateUtils;
+import com.guru.order.utils.StringUtils;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -57,7 +58,7 @@ public class CsvUtils {
 		dto.setCandidateName(nextLine[5]); // ClientName-column
 		dto.setCommodityName(nextLine[7]); // Symbol-column
 		dto.setExpirtyDate(DateUtils.parseToDDMMYYYY(nextLine[9])); // ExpiryDate-Column
-		dto.setBuySellIndicator(nextLine[15]); //BuySellIndicator
+		dto.setBuySellIndicator(StringUtils.toUpperCase(nextLine[15])); //BuySellIndicator
 		dto.setTradeQuantity(Integer.parseInt(nextLine[16]));
 		dto.setUnitPrice(Float.parseFloat(nextLine[17]));
 		dto.setTradeValue(Float.parseFloat(nextLine[18]));

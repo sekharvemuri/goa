@@ -21,7 +21,9 @@ public interface WorkOrderDao {
 	Map<String, List<CommodityVO>> getGroupCommodities();
 	List<GroupVO> getAdHocGroups();
 	List<RecentExecutionVO> getRecentExecutions();
-	void saveOrderConfirmation(List<OrderConfirmationDTO> list);
+	void saveOrderConfirmation(Map<Long, Map<String, List<OrderConfirmationDTO>>> map);
 	void saveExecutedOrderByGroupName(List<OrderConfirmationDTO> list);
+	void saveTradedOrders(List<OrderConfirmationDTO> confirmOrdersList, int groupId, String groupName);
+	void saveWorkOrders(WorkOrderVO vo);
 	
 }

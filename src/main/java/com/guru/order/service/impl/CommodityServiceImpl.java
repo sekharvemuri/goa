@@ -13,11 +13,12 @@ import com.guru.order.service.CommodityService;
 
 @Component
 public class CommodityServiceImpl implements CommodityService {
-	
+
 	private CommodityDao symbolsDao;
 
 	public List<CommodityDTO> getCommodities() {
-		List<CommodityVO> symbolsList = symbolsDao.getCommodities();
+		List<CommodityVO> symbolsList = null;
+		symbolsDao.getCommodities();
 		return CommodityConverter.getCommodities(symbolsList);
 	}
 

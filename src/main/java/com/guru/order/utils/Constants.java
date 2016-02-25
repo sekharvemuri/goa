@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 
 public interface Constants {
 	
+	String DEV_MODE_MOCK = "MOCK";
 	SimpleDateFormat sdf_yyyyddMMHHmmss = new SimpleDateFormat("yyyyddMMHHmmss");
 
 	enum BUY_SELL_OPTION {

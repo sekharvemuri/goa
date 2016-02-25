@@ -56,10 +56,22 @@ public class DateUtils {
 		Date date = sdf_dd_MM_yyyy.parse(dateTime);
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
+		trimToDate(cal);
 		return cal;
 	}
 
+	public static void trimToDate(Calendar cal) {
+		cal.set(Calendar.HOUR, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+	}
+
 	public static String formatToDDMMYYYY(Date date) {
-		return sdf_dd_MM_yyyy.format(date);
+		return (date != null) ? sdf_dd_MM_yyyy.format(date) : null;
+	}
+	
+	public static String formatToDDMMYYYY(Calendar cal) {
+		return sdf_dd_MM_yyyy.format(cal.getTime());
 	}
 }
