@@ -1,7 +1,9 @@
 package com.guru.order.dto;
 
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.Calendar;
+import java.util.Date;
 
 import com.guru.order.utils.DateUtils;
 
@@ -10,13 +12,13 @@ public class OrderData implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Long workOrderId;
 	private CommodityDTO commodity;
-	private Long expiryDate;
-	private String option;
+	private String expiryDate;
+	private float prevSellValue;
+	private String prevSellDate;
+	private int prevSellQuantity;
+	private float orderPrice;
+	private String orderType;
 	private int quantity;
-	private float orderAverageValue;
-	private float orderValue;
-	private float lastSoldValue;
-	private int lastSoldQuantity;
 
 	public Long getWorkOrderId() {
 		return workOrderId;
@@ -34,24 +36,52 @@ public class OrderData implements Serializable {
 		this.commodity = commodity;
 	}
 
-	public Long getExpiryDate() {
+	public String getExpiryDate() {
 		return expiryDate;
 	}
-	
-	public Calendar getExpiryDateAsDate() {
-		return DateUtils.getCalendar(this.getExpiryDate());
+
+	public void setExpiryDate(String expiryDate) {
+		this.expiryDate = expiryDate;
 	}
 
-	public void setExpiryDate(Long endDate) {
-		this.expiryDate = endDate;
+	public float getPrevSellValue() {
+		return prevSellValue;
 	}
 
-	public String getOption() {
-		return option;
+	public void setPrevSellValue(float prevSellValue) {
+		this.prevSellValue = prevSellValue;
 	}
 
-	public void setOption(String option) {
-		this.option = option;
+	public String getPrevSellDate() {
+		return prevSellDate;
+	}
+
+	public void setPrevSellDate(String prevSellDate) {
+		this.prevSellDate = prevSellDate;
+	}
+
+	public int getPrevSellQuantity() {
+		return prevSellQuantity;
+	}
+
+	public void setPrevSellQuantity(int prevSellQuantity) {
+		this.prevSellQuantity = prevSellQuantity;
+	}
+
+	public float getOrderPrice() {
+		return orderPrice;
+	}
+
+	public void setOrderPrice(float orderPrice) {
+		this.orderPrice = orderPrice;
+	}
+
+	public String getOrderType() {
+		return orderType;
+	}
+
+	public void setOrderType(String orderType) {
+		this.orderType = orderType;
 	}
 
 	public int getQuantity() {
@@ -62,36 +92,20 @@ public class OrderData implements Serializable {
 		this.quantity = quantity;
 	}
 
-	public float getOrderAverageValue() {
-		return orderAverageValue;
+	public Date getExpiryDateAsDate() {
+		try {
+			return DateUtils.getDateAsddMMMyy(expiryDate);
+		} catch (ParseException e) {
+			return null;
+		}
 	}
 
-	public void setOrderAverageValue(float orderAverageValue) {
-		this.orderAverageValue = orderAverageValue;
-	}
-
-	public float getOrderValue() {
-		return orderValue;
-	}
-
-	public void setOrderValue(float unitValue) {
-		this.orderValue = unitValue;
-	}
-
-	public float getLastSoldValue() {
-		return lastSoldValue;
-	}
-
-	public void setLastSoldValue(float lastSoldValue) {
-		this.lastSoldValue = lastSoldValue;
-	}
-
-	public int getLastSoldQuantity() {
-		return lastSoldQuantity;
-	}
-
-	public void setLastSoldQuantity(int lastSoldQuantity) {
-		this.lastSoldQuantity = lastSoldQuantity;
+	public Calendar getExpiryDateAsCal() {
+		try {
+			return DateUtils.getCalendarAsddMMMyy(expiryDate);
+		} catch (ParseException e) {
+			return null;
+		}
 	}
 
 }

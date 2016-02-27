@@ -2,16 +2,17 @@ app.controller("WebHomeController", ['$scope', 'groupData', '$location',
 	function($scope, groupData, $location){
 	$scope.commodities = groupData.commodities;
 	$scope.groups = groupData.groups;
-	$scope.columnHeadings = ["Comodity", "Expiry date", "Prev sell price", "Prev sell date", "Prev sell qty", "Order price", "Buy qty", "Sell qty", "Delete"];
+	$scope.columnHeadings = ["Comodity", "Expiry date", "Prev sell price", "Prev sell date", "Prev sell qty", "Order price", "Order Type", "Quantity", "Delete"];
+	$scope.orderTypes = ["BUY", "SELL"];
 	
 	$scope.getUserCount = function(users){
 		var userArray = users.split(",");
 		return userArray.length;
 	}
 	
-	$scope.getExpiryDates = function(comodityId){
+	$scope.getExpiryDates = function(comodityName){
 		var commodity = _.find($scope.commodities, function(commodity){
-			return commodity.name == comodityId;
+			return commodity.name == comodityName;
 		});
 		if(commodity){
 			return commodity.expiryDates.split(',');
@@ -27,7 +28,7 @@ app.controller("WebHomeController", ['$scope', 'groupData', '$location',
 	$scope.addCommodity = function(groupIndex){
 		var newCommodity = {
             "comodityId":"",
-            "prevOrderValue":"-",
+            "prevSellValue":"-",
             "sellDate":"-",
             "quantity":"-"
         };
@@ -37,20 +38,20 @@ app.controller("WebHomeController", ['$scope', 'groupData', '$location',
 	$scope.postOrder = function(){
 		for(var i=0; i< $scope.groups.length; i++){
 			for(var j=0; j<$scope.groups[i].orderData.length; j++){
-				if(!$scope.groups[i].orderData[j].comodityId){
-					alert("Please select commodity in group "+$scope.groups[i].groupName);
+				if(!$scope.groups[i].orderData[j].commodity.name){
+					alert("Please select 'Commodity' in group "+$scope.groups[i].groupName);
 					return;
 				}
 				if(!$scope.groups[i].orderData[j].expiryDate){
-					alert("Please select expirty date for "+ $scope.groups[i].orderData[j].comodityId +" in group "+$scope.groups[i].groupName);
+					alert("Please select 'Expirty Date' for "+ $scope.groups[i].orderData[j].commodity.name+" in group "+$scope.groups[i].groupName);
 					return;
 				}
 				if(!$scope.groups[i].orderData[j].orderPrice){
-					alert("Please enter order price for "+ $scope.groups[i].orderData[j].comodityId +" in group "+$scope.groups[i].groupName);
+					alert("Please enter 'Oorder Price' for "+ $scope.groups[i].orderData[j].commodity.name +" in group "+$scope.groups[i].groupName);
 					return;
 				}
-				if(!$scope.groups[i].orderData[j].buyQuantity && !$scope.groups[i].orderData[j].sellQuantity){
-					alert("Please enter sell quantity/buy quantity for "+ $scope.groups[i].orderData[j].comodityId +" in group "+$scope.groups[i].groupName);
+				if(!$scope.groups[i].orderData[j].quantity){
+					alert("Please enter 'Quantity' for "+ $scope.groups[i].orderData[j].commodity.name +" in group "+$scope.groups[i].groupName);
 					return;
 				}
 				if($scope.groups[i].orderData[j].buyQuantity){

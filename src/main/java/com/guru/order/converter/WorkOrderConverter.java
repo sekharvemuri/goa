@@ -27,11 +27,11 @@ public class WorkOrderConverter {
 							vo.setGroupName(groupDto.getGroupName());
 							vo.setCandidateId(Long.parseLong(canId.trim()));
 							vo.setCommodityName(orderData.getCommodity().getName());
-							vo.setOrderType(orderData.getOption());
-							vo.setOrderAmount(orderData.getOrderValue());
+							vo.setOrderType(orderData.getOrderType());
+							vo.setOrderAmount(orderData.getOrderPrice());
 							vo.setOrderQuantity(orderData.getQuantity());
 							vo.setOrderTime(todayCal);
-							vo.setExpiryDate(orderData.getExpiryDateAsDate());
+							vo.setExpiryDate(orderData.getExpiryDateAsCal());
 							list.add(vo);
 						}
 					}

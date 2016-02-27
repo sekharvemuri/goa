@@ -98,8 +98,8 @@ List<GroupDTO> ordersList = (List<GroupDTO>) request.getAttribute("ordersList");
 						<td style="visibility: hidden; display: none;"><%=orderData.getWorkOrderId() %></td>
 						<td><%=groupDto.getGroupName() %></td>
 						<td><%=orderData.getCommodity().getName() %></td>
-						<td><%=orderData.getOrderValue() %></td>
-						<td><%=orderData.getOption() %></td>
+						<td><%=orderData.getOrderPrice()%></td>
+						<td><%=orderData.getOrderType()%></td>
 						<td><%=orderData.getQuantity() %></td>
 						<td><input type="text" value=""></td>
 						<td><input type="text" value=""></td>

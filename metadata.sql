@@ -34,6 +34,12 @@ create table commodity (
 	sub_interval_3 decimal(6,2)
 );
 
+create table commodity_expiry_date (
+	name varchar(10),
+	expiry_date date,
+	primary key (name, expiry_date)
+);
+
 insert into commodity (NAME) values ('ALLUMINIUM');
 insert into commodity (NAME) values ('ALUMINI');
 insert into commodity (NAME) values ('COPPER');
@@ -47,6 +53,13 @@ insert into commodity (NAME) values ('SILVERM');
 insert into commodity (NAME) values ('SILVERMIC');
 insert into commodity (NAME) values ('ZINC');
 insert into commodity (NAME) values ('ZINCMINI');
+
+insert into commodity_expiry_date (NAME, expiry_date) values ('ALLUMINIUM', STR_TO_DATE('2016-03-29', '%Y-%m-%d'));
+insert into commodity_expiry_date (NAME, expiry_date) values ('ALLUMINIUM', STR_TO_DATE('2016-03-30', '%Y-%m-%d'));
+insert into commodity_expiry_date (NAME, expiry_date) values ('ALLUMINIUM', STR_TO_DATE('2016-03-31', '%Y-%m-%d'));
+insert into commodity_expiry_date (NAME, expiry_date) values ('COPPER', STR_TO_DATE('2016-04-28', '%Y-%m-%d'));
+insert into commodity_expiry_date (NAME, expiry_date) values ('COPPER', STR_TO_DATE('2016-04-29', '%Y-%m-%d'));
+insert into commodity_expiry_date (NAME, expiry_date) values ('COPPER', STR_TO_DATE('2016-04-30', '%Y-%m-%d'));
 
 create table groups (
 	id int primary key auto_increment,

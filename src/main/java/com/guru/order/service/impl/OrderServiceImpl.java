@@ -109,8 +109,8 @@ public class OrderServiceImpl implements OrderService {
 									int compare = o1.getCommodity().getId()
 											- o2.getCommodity().getId();
 									if (compare == 0) {
-										compare = o2.getOption().compareTo(
-												o1.getOption());
+										compare = o2.getOrderType().compareTo(
+												o1.getOrderType());
 										// TODO: compare based on expiry date
 									}
 									return compare;
@@ -169,14 +169,12 @@ public class OrderServiceImpl implements OrderService {
 				workOrderVO.getCommodityId(), workOrderVO.getCommodityName());
 		orderData.setCommodity(commodityDTO);
 		if (workOrderVO.getExpiryDate() != null) {
-			orderData.setExpiryDate(workOrderVO.getExpiryDate()
-					.getTimeInMillis());
+			orderData.setExpiryDate(DateUtils.formatToDDMMMYYYY(workOrderVO.getExpiryDate()));
 		}
 		orderData.setWorkOrderId(workOrderVO.getId());
-		orderData.setOption(workOrderVO.getOrderType());
+		orderData.setOrderType(workOrderVO.getOrderType());
 		orderData.setQuantity(workOrderVO.getOrderQuantity());
-		orderData.setOrderAverageValue(workOrderVO.getOrderAmount());
-		orderData.setOrderValue(workOrderVO.getOrderAmount());
+		orderData.setOrderPrice(workOrderVO.getOrderAmount());
 		return orderData;
 	}
 
@@ -259,10 +257,10 @@ public class OrderServiceImpl implements OrderService {
 			List<OrderData> ordersList = groupDto.getOrderData();
 			for (OrderData orderData : ordersList) {
 				String commodityName = orderData.getCommodity().getName();
-				String orderType = orderData.getOption();
+				String orderType = orderData.getOrderType();
 				Map<String, List<OrderConfirmationDTO>> confirmOrdersMap = getTradedCandidates(
 						tradesList, usersStr, commodityName, orderType,
-						orderData.getExpiryDateAsDate());
+						orderData.getExpiryDateAsCal());
 				if (confirmOrdersMap.size() > 0) {
 					Set<String> keySet = confirmOrdersMap.keySet();
 					if (confirmOrdersMap.size() == 1) {

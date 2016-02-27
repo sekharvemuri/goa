@@ -6,13 +6,17 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
+
 public class DateUtils {
 
 	public static SimpleDateFormat sdf_dd_MMM_yy = new SimpleDateFormat(
 			"dd-MMM-yy");
+	public static SimpleDateFormat sdf_dd_MMM_yyyy = new SimpleDateFormat(
+			"dd-MMM-yyyy");
 	public static SimpleDateFormat sdf_dd_MM_yyyy = new SimpleDateFormat(
 			"dd-MM-yyyy");
-	
+
 	public static String formatToDDMMMYY(Long timeInMillis) {
 		String result = "";
 		if (timeInMillis != null) {
@@ -21,7 +25,7 @@ public class DateUtils {
 		}
 		return result;
 	}
-	
+
 	public static Timestamp getSqlTimeStamp(Calendar cal) {
 		Timestamp timeStamp = null;
 		if (cal != null) {
@@ -51,8 +55,9 @@ public class DateUtils {
 		cal.setTimeInMillis(timeInMillis);
 		return cal;
 	}
-	
-	public static Calendar parseToDDMMYYYY(String dateTime) throws ParseException {
+
+	public static Calendar parseToDDMMYYYY(String dateTime)
+			throws ParseException {
 		Date date = sdf_dd_MM_yyyy.parse(dateTime);
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
@@ -70,8 +75,29 @@ public class DateUtils {
 	public static String formatToDDMMYYYY(Date date) {
 		return (date != null) ? sdf_dd_MM_yyyy.format(date) : null;
 	}
-	
+
 	public static String formatToDDMMYYYY(Calendar cal) {
 		return sdf_dd_MM_yyyy.format(cal.getTime());
+	}
+
+	public static String formatToDDMMMYYYY(Calendar cal) {
+		return sdf_dd_MMM_yyyy.format(cal.getTime());
+	}
+
+	public static Date getDateAsddMMMyy(String expiryDate) throws ParseException {
+		if (StringUtils.isNotBlank(expiryDate)) {
+			return sdf_dd_MMM_yy.parse(expiryDate);
+		}
+		return null;
+	}
+
+	public static Calendar getCalendarAsddMMMyy(String expiryDate) throws ParseException {
+		if (StringUtils.isNotBlank(expiryDate)) {
+			Date date = sdf_dd_MMM_yy.parse(expiryDate);
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(date);
+			return cal;
+		}
+		return null;
 	}
 }
