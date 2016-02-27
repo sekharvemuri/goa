@@ -1,6 +1,8 @@
 package com.guru.order.data;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.guru.order.data.vo.CommodityVO;
 
@@ -21,5 +23,7 @@ public interface CommodityDao {
 	 * @throws Exception
 	 */
 	void addCommodity(CommodityVO commodity) throws Exception;
+	
+	Map<Integer, CommodityVO> getCommodityIntervals(Set<Integer> commodityIDsSet);
 	
 }

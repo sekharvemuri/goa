@@ -1,6 +1,8 @@
 package com.guru.order.service.impl;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,17 +16,24 @@ import com.guru.order.service.CommodityService;
 @Component
 public class CommodityServiceImpl implements CommodityService {
 
-	private CommodityDao symbolsDao;
+	private CommodityDao commodityDao;
 
 	public List<CommodityDTO> getCommodities() {
 		List<CommodityVO> symbolsList = null;
-		symbolsDao.getCommodities();
+		commodityDao.getCommodities();
 		return CommodityConverter.getCommodities(symbolsList);
+	}
+	
+
+
+	@Override
+	public Map<Integer, CommodityVO> getCommodityIntervals(Set<Integer> commodityIDsSet) {
+		return commodityDao.getCommodityIntervals(commodityIDsSet);
 	}
 
 	@Autowired
-	public void setSymbolsDao(CommodityDao symbolsDao) {
-		this.symbolsDao = symbolsDao;
+	public void setCommodityDao(CommodityDao commodityDao) {
+		this.commodityDao = commodityDao;
 	}
 
 }
