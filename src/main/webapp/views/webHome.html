@@ -1,9 +1,9 @@
 <div ng-repeat="group in groups" class="groupWrapper">
 	<div class="row" ng-init="groupIndex = $index">
 		<div class="col-md-11" style="padding: 25px;">
-			<div class="bold">
+			<div class="bold" style="margin:auto;border: 1px solid white;padding: 10px;">
 				<div>
-					<span ng-bind="group.groupName"></span>
+					<span style="color:red;" ng-bind="group.groupName"></span>
 					&nbsp;
 					Users: <span ng-bind="group.users"></span>
 					(<span ng-bind="getUserCount(group.users)"></span>)
@@ -67,10 +67,9 @@
 	</div>
 </div>
 
-<div class="col-md-11">
-	<input type="checkbox" ng-model="sendMail"/>Send mail
-</div>
-
-<div class="col-md-11">
-	<button class="btn btn-success" style="margin: 0 auto;" ng-click="postOrder()">Submit</button>
+<div class="empty-div"></div>
+<div class="row footer text-center">
+	<div class="col-md-10">
+		<button class="btn btn-success" ng-click="postOrder()">Place order</button>
+	</div>
 </div>
