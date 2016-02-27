@@ -1,6 +1,14 @@
 app.service("UserService", ['$http', function($http){
 	var service = {
-		getUsers: function(){
+			getUsers: function(){
+				return $http.get("rest/user").then(function(response){
+					return response.data;
+				}, function(){
+					console.log("error::: ");
+				});
+			},
+			
+		getUsersDummy: function(){
 			return $http.get("scripts/services/UserService.js").then(function(response){
 				console.log("Getting users");
 				var users = [{

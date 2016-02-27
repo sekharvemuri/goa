@@ -6,8 +6,8 @@
 			<th>Action</th>
 		</tr>
 		<tr ng-repeat="comodity in comodities">
-			<td ng-bind="comodity.comodityId"></td>
-			<td ng-bind="comodity.comodityName"></td>
+			<td ng-bind="comodity.id"></td>
+			<td ng-bind="comodity.name"></td>
 			<td>
 				<div class="pointer">
                     <span class="glyphicon glyphicon-menu-hamburger" ng-click="editComodity($index)"></span>

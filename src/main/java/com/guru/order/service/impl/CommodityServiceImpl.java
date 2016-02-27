@@ -19,13 +19,40 @@ public class CommodityServiceImpl implements CommodityService {
 	private CommodityDao commodityDao;
 
 	public List<CommodityDTO> getCommodities() {
-		List<CommodityVO> symbolsList = null;
-		commodityDao.getCommodities();
-		return CommodityConverter.getCommodities(symbolsList);
+		List<CommodityVO> commodityVOs = null;
+		commodityVOs = commodityDao.getCommodities();
+		return CommodityConverter.getCommodities(commodityVOs);
+	}
+
+	@Override
+	public void updateCommodity(CommodityDTO dto) {
+		try {
+			commodityDao.updateCommodity(new CommodityVO(dto.getId(), dto
+					.getName()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void addCommodity(CommodityDTO commodityDTO) {
+		try {
+			commodityDao
+					.addCommodity(new CommodityVO(0, commodityDTO.getName()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void deleteCommodity(CommodityDTO commodityDTO) {
+		try {
+			commodityDao.deleteCommodity(commodityDTO.getId());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
-
-
 	@Override
 	public Map<Integer, CommodityVO> getCommodityIntervals(Set<Integer> commodityIDsSet) {
 		return commodityDao.getCommodityIntervals(commodityIDsSet);
@@ -35,5 +62,4 @@ public class CommodityServiceImpl implements CommodityService {
 	public void setCommodityDao(CommodityDao commodityDao) {
 		this.commodityDao = commodityDao;
 	}
-
 }
