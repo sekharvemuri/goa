@@ -19,10 +19,10 @@
 				<tbody>
 					<tr ng-repeat="order in group.orderData">
 						<td>
-							<select style="width: 100%;" ng-model="order.comodity.name" ng-options="commodity.name as commodity.name for commodity in group.commodities"></select>
+							<select style="width: 100%;" ng-model="order.commodity" ng-options="commodity.name for commodity in group.commodities track by commodity.name" ng-change="changeExpiryDates(groupIndex, $index)"></select>
 						</td>
 						<td>
-							<select style="width: 100%;" ng-model="order.expiryDate" ng-options="expiryDate as expiryDate for expiryDate in getExpiryDates(order.comodity.name)"></select>
+							<select style="width: 100%;" ng-model="order.expiryDate" ng-options="expiryDate for expiryDate in getExpiryDates(groupIndex, $index, order.commodity.name) track by expiryDate"></select>
 						</td>
 						<td class="text-center">
 							<div style="display: inline-block;" ng-bind="order.prevSellValue"></div>
@@ -65,6 +65,10 @@
 			<div class="clear"></div>
 		</div>
 	</div>
+</div>
+
+<div class="col-md-11">
+	<input type="checkbox" ng-model="sendMail"/>Send mail
 </div>
 
 <div class="col-md-11">

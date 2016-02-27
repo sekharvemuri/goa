@@ -4,21 +4,27 @@ app.controller("WebHomeController", ['$scope', 'groupData', '$location',
 	$scope.groups = groupData.groups;
 	$scope.columnHeadings = ["Comodity", "Expiry date", "Prev sell price", "Prev sell date", "Prev sell qty", "Order price", "Order Type", "Quantity", "Delete"];
 	$scope.orderTypes = ["BUY", "SELL"];
+	$scope.sendMail = false;
 	
 	$scope.getUserCount = function(users){
 		var userArray = users.split(",");
 		return userArray.length;
 	}
 	
-	$scope.getExpiryDates = function(comodityName){
+	$scope.getExpiryDates = function(groupIndex, orderIndex, comodityName){
 		var commodity = _.find($scope.commodities, function(commodity){
 			return commodity.name == comodityName;
 		});
+		//$scope.groups[groupIndex].orderData[orderIndex].expiryDate = "";
 		if(commodity){
 			return commodity.expiryDates.split(',');
 		} else{
 			return [];
 		}
+	}
+	
+	$scope.changeExpiryDate = function(groupIndex, orderIndex){
+		console.log($scope.groups[groupIndex].orderData[orderIndex]);
 	}
 	
 	$scope.deleteCommodity = function(groupIndex, orderIndex){
@@ -62,6 +68,7 @@ app.controller("WebHomeController", ['$scope', 'groupData', '$location',
 				}
 			}
 		}
+		console.log($scope.sendMail);
 		sessionStorage.setItem("orderData", JSON.stringify($scope.groups));
 		sessionStorage.setItem("commodityData", JSON.stringify($scope.commodities));
 		sessionStorage.setItem("groupData", JSON.stringify(groupData));
