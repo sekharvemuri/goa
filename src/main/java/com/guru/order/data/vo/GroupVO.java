@@ -9,6 +9,7 @@ public class GroupVO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private int id;
 	private String name;
+	private int subTypeId;
 	private List<CommodityVO> commodities;
 	private List<CandidateVO> candidates;
 
@@ -20,7 +21,7 @@ public class GroupVO implements Serializable {
 		super();
 		this.name = name;
 	}
-	
+
 	public GroupVO(int id, String name) {
 		super();
 		this.id = id;
@@ -43,6 +44,14 @@ public class GroupVO implements Serializable {
 		this.name = name;
 	}
 
+	public int getSubTypeId() {
+		return subTypeId;
+	}
+
+	public void setSubTypeId(int subTypeId) {
+		this.subTypeId = subTypeId;
+	}
+
 	public List<CommodityVO> getCommodities() {
 		return commodities;
 	}
@@ -60,7 +69,7 @@ public class GroupVO implements Serializable {
 	}
 
 	public void addCommodity(CommodityVO commodityVO) {
-		if(this.commodities == null) {
+		if (this.commodities == null) {
 			this.commodities = new ArrayList<CommodityVO>();
 		}
 		this.commodities.add(commodityVO);

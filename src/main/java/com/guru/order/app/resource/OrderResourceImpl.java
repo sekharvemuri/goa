@@ -105,5 +105,10 @@ public class OrderResourceImpl {
 		}
 		return "";
 	}
-	
+
+	@GET
+	@Path("/nextOrders")
+	public void createNextOrders() {
+		orderService.createNextOrders();
+	}
 }

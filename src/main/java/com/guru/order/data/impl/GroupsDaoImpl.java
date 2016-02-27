@@ -22,6 +22,7 @@ import com.guru.order.data.GroupsDao;
 import com.guru.order.data.vo.CandidateVO;
 import com.guru.order.data.vo.CommodityVO;
 import com.guru.order.data.vo.GroupVO;
+import com.guru.order.data.vo.SubTypeVO;
 
 @Component
 public class GroupsDaoImpl extends BaseDao implements GroupsDao {
@@ -36,7 +37,7 @@ public class GroupsDaoImpl extends BaseDao implements GroupsDao {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public List<GroupVO> getGroupsWithCandidates() {
-		String query = "select id, name from groups g, group_candidates gc where g.id=gc.group_id group by id, name";
+		String query = "select id, name from groups g, group_candidates gc where g.id=gc.group_id group by id, name order by name";
 		return ((List<GroupVO>) getJdbcTemplate().query(query, new BeanPropertyRowMapper(GroupVO.class)));
 	}
 
@@ -217,5 +218,11 @@ public class GroupsDaoImpl extends BaseDao implements GroupsDao {
 	public List<Long> getCandidatesByGroupName(String groupName) {
 		String query = "select c.id from candidates c, group_candidates gc, groups g where gc.group_id=g.id and c.id=gc.cand_id and g.name='" + groupName + "' ";
 		return getJdbcTemplate().queryForList(query, Long.class);
+	}
+
+	@Override
+	public SubTypeVO getSubType(Long groupId) {
+		String query = "select id, type_id as typeId, name from sub_types st, sub_type_groups stg where st.id=stg.sub_type_id and stg.group_id=?";
+		return getJdbcTemplate().queryForObject(query, new Object[] {groupId}, new BeanPropertyRowMapper<SubTypeVO>(SubTypeVO.class));
 	}
 }

@@ -1,13 +1,15 @@
 package com.guru.order.dto;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class CommodityDTO implements Serializable, Comparable<CommodityDTO> {
 
 	private static final long serialVersionUID = 1L;
 	private int id;
 	private String name;
-	
+	private List<String> expiryDates;
+
 	public CommodityDTO() {
 		super();
 	}
@@ -39,9 +41,18 @@ public class CommodityDTO implements Serializable, Comparable<CommodityDTO> {
 		this.name = name;
 	}
 
+	public List<String> getExpiryDates() {
+		return expiryDates;
+	}
+
+	public void setExpiryDates(List<String> expiryDates) {
+		this.expiryDates = expiryDates;
+	}
+
 	@Override
 	public int compareTo(CommodityDTO other) {
-		return ((this.name == null) ? -1 : (this.name.compareTo(other.getName())));
+		return ((this.name == null) ? -1 : (this.name
+				.compareTo(other.getName())));
 	}
 
 }

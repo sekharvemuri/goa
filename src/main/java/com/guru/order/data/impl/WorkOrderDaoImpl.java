@@ -89,19 +89,14 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 	}
 
 	@Override
-	public List<WorkOrderVO> getOrders(String orderType/*, Calendar orderTime*/) {
+	public List<WorkOrderVO> getOrders(String orderType) {
 		String query = "select g.name as groupName, c.name as commodityName, c.id as commodityId, avg(wo.order_amount) orderAmount, "
 				+ " wo.id as workOrderId, wo.order_quantity as orderQuantity, wo.order_time as orderTime, wo.order_type as orderType, wo.expiry_date expiryDate "
 				+ " from groups g, commodity c, work_order wo where g.id=wo.group_id and c.id = wo.cmdty_id and wo.executed_amount is null "
 				+ " and wo.order_type = ? "
 				+ " group by wo.group_id, wo.cmdty_id, wo.order_time";
 		
-//		String query = "select s.group_name as groupName, s.symbol_name as commodityName, c.id as commodityId, avg(s.order_amount) as orderAmount, s.order_quantity as orderQuantity,"
-//				+ " s.order_time as orderTime, s.order_type as orderType, s.expiry_date as expiryDate"
-//				+ " from work_order s, commodity c "
-//				+ " where s.executed_time is null and c.name = s.symbol_name and s.order_type= ? " //and s.order_time = ? "
-//				+ " group by s.group_name, s.symbol_name";
-		List<WorkOrderVO> ordersList = getJdbcTemplate().query(query, new Object[] {orderType/*,  DateUtils.getSqlTimeStamp(orderTime)*/}, new ResultSetExtractor<List<WorkOrderVO>>() {
+		List<WorkOrderVO> ordersList = getJdbcTemplate().query(query, new Object[] {orderType}, new ResultSetExtractor<List<WorkOrderVO>>() {
 
 			@Override
 			public List<WorkOrderVO> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -320,10 +315,6 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 				+ " and order_type=?";
 		
 		for (OrderConfirmationDTO dto : list) {
-//			System.out.println("In Loop - CandidateId:" + dto.getCandidateId() + " - Symbol:" + dto.getCommodityName()
-//					+ " - ExpiryDate:" + DateUtils.formatToDDMMYYYY(dto.getExpirtyDate().getTime()) + " - OrderType:" + dto.getBuySellIndicator()
-//					+ " - Quantity:" + dto.getTradeQuantity() + " - Price:" + dto.getUnitPrice() + " - " + groupName);
-			
 			String str = String.format("update work_order set executed_amount=%s, executed_quantity=%s, executed_time='%s' "
 					+ " where candidate_id=%s "
 					+ " and cmdty_id=(select id from commodity where name='%s') "
@@ -338,25 +329,75 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 			getJdbcTemplate().update(query, params);
 		}
 		
-//		getJdbcTemplate().batchUpdate(query, new BatchPreparedStatementSetter() {
-//			
-//			@Override
-//			public void setValues(PreparedStatement ps, int i) throws SQLException {
-//				OrderConfirmationDTO dto = list.get(i);
-//				ps.setFloat(1, dto.getUnitPrice());
-//				ps.setInt(2, dto.getTradeQuantity());
-//				ps.setTimestamp(3, DateUtils.getSqlTimeStamp(executedTime));
-//				ps.setLong(4, dto.getCandidateId());
-//				ps.setString(5, dto.getCommodityName());
-//				ps.setString(6, DateUtils.formatToDDMMYYYY(dto.getExpirtyDate()));
-//				ps.setString(7, dto.getBuySellIndicator().toUpperCase());
-//			}
-//			
-//			@Override
-//			public int getBatchSize() {
-//				return list.size();
-//			}
-//		});
 	}
-	
+
+	@Override
+	public List<WorkOrderVO> getTradedOrders(String orderType) {
+		String query = "select wo.group_id as groupId, g.name as groupName, wo.cmdty_id as commodityId, c.name as commodityName, "
+				+ " avg(wo.executed_amount) as tradedPrice, avg(executed_quantity) as tradeQuantity, avg(wo.executed_time) as executedTime "
+				+ " from work_order wo, groups g, commodity c where wo.group_id = g.id and wo.cmdty_id = c.id "
+				+ " and wo.executed_amount is not null and wo.order_type=? "
+				+ " group by wo.group_id, wo.cmdty_id, wo.expiry_date";
+
+		List<WorkOrderVO> ordersList = getJdbcTemplate().query(query, new Object[] {orderType}, new ResultSetExtractor<List<WorkOrderVO>>() {
+
+			@Override
+			public List<WorkOrderVO> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				List<WorkOrderVO> list = null;
+				if (rs != null) {
+					list = new ArrayList<WorkOrderVO>();
+					while (rs.next()) {
+						WorkOrderVO vo = new WorkOrderVO();
+						vo.setGroupId(rs.getLong("groupId"));
+						vo.setGroupName(rs.getString("groupName"));
+						vo.setCommodityId(rs.getInt("commodityId"));
+						vo.setCommodityName(rs.getString("commodityName"));
+						vo.setExecutedAmount(rs.getFloat("tradedPrice"));
+						vo.setExecutedQuantity(rs.getInt("tradeQuantity"));
+						Calendar executedTime = DateUtils.getCalendar(rs.getTimestamp("executedTime"));
+						DateUtils.trimToDate(executedTime);
+						vo.setExecutedTime(executedTime);
+						list.add(vo);
+					}
+				}
+				return list;
+			}
+			
+		});
+		return ordersList;		
+	}
+
+	@Override
+	public void saveNextWorkOrders(final List<WorkOrderVO> list) {
+		String query = " insert into next_work_order (group_id, cmdty_id, order_type, candidate_id, order_quantity, order_amount, order_time, expiry_date, "
+				+ " prev_sell_price, prev_sell_date, prev_sell_qty) "
+				+ " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		
+		if (list != null && !list.isEmpty()) {
+			getJdbcTemplate().batchUpdate(query,
+					new BatchPreparedStatementSetter() {
+
+						public void setValues(PreparedStatement ps, int i)
+								throws SQLException {
+							WorkOrderVO vo = list.get(i);
+							ps.setLong(1, vo.getGroupId());
+							ps.setLong(2, vo.getCommodityId());
+							ps.setString(3, vo.getOrderType());
+							ps.setLong(4, vo.getCandidateId());
+							ps.setInt(5, vo.getOrderQuantity());
+							ps.setFloat(6, vo.getOrderAmount());
+							ps.setTimestamp(7, DateUtils.getSqlTimeStamp(vo.getOrderTime()));
+							ps.setTimestamp(8, DateUtils.getSqlTimeStamp(vo.getExpiryDate()));
+							ps.setFloat(9, vo.getExecutedAmount());
+							ps.setTimestamp(10, DateUtils.getSqlTimeStamp(vo.getPreviousSellDate()));
+							ps.setInt(11, vo.getPreviousSellQty());
+						}
+
+						public int getBatchSize() {
+							return list.size();
+						}
+					});
+		}
+	}
+
 }

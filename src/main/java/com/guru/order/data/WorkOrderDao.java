@@ -15,7 +15,7 @@ public interface WorkOrderDao {
 	void movePreviousOrdersToBackup();
 	void saveWorkOrders(List<WorkOrderVO> list);
 	Calendar getRecentOrderTime(String orderType);
-	List<WorkOrderVO> getOrders(String orderType/*, Calendar orderTime*/);
+	List<WorkOrderVO> getOrders(String orderType);
 	List<WorkOrderVO> getNextOrders();
 	Map<String, List<String>> getGroupUsers();
 	Map<String, List<CommodityVO>> getGroupCommodities();
@@ -25,5 +25,7 @@ public interface WorkOrderDao {
 	void saveExecutedOrderByGroupName(List<OrderConfirmationDTO> list);
 	void saveTradedOrders(List<OrderConfirmationDTO> confirmOrdersList, int groupId, String groupName);
 	void saveWorkOrders(WorkOrderVO vo);
+	List<WorkOrderVO> getTradedOrders(String orderType);
+	void saveNextWorkOrders(List<WorkOrderVO> nextSellOrders);
 	
 }

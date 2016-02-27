@@ -27,7 +27,11 @@ insert into SUB_TYPES (TYPE_ID, NAME) values ((select ID from TYPES where NAME='
 
 create table commodity (
 	ID int primary key auto_increment,
-	NAME varchar(10) unique
+	NAME varchar(10) unique,
+	main_interval decimal(6,2), 
+	sub_interval_1 decimal(6,2),
+	sub_interval_2 decimal(6,2),
+	sub_interval_3 decimal(6,2)
 );
 
 insert into commodity (NAME) values ('ALLUMINIUM');
@@ -43,16 +47,6 @@ insert into commodity (NAME) values ('SILVERM');
 insert into commodity (NAME) values ('SILVERMIC');
 insert into commodity (NAME) values ('ZINC');
 insert into commodity (NAME) values ('ZINCMINI');
-
-create table sub_type_commodities (
-	sub_type_id int,
-	cmdty_id int,
-	max_interval decimal(6,2),
-	sub_interval_1 decimal(6,2),
-	sub_interval_2 decimal(6,2),
-	sub_interval_3 decimal(6,2),
-	primary key (sub_type_id, cmdty_id)
-);
 
 create table groups (
 	id int primary key auto_increment,
@@ -134,7 +128,7 @@ create table work_order (
 );
 
 create table next_work_order (
-	id int primary key, 
+	id int primary key auto_increment, 
 	group_id int,
 	cmdty_id int,
 	prev_sell_price decimal(9, 2),

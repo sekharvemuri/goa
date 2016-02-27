@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.guru.order.data.vo.GroupVO;
+import com.guru.order.data.vo.SubTypeVO;
 
 public interface GroupsDao {
 	
@@ -29,5 +30,7 @@ public interface GroupsDao {
 	void saveGroupCommodity(String groupName, String commodityName);
 
 	List<Long> getCandidatesByGroupName(String groupName);
+
+	SubTypeVO getSubType(Long groupId);
 
 }
