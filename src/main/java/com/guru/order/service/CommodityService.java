@@ -10,6 +10,13 @@ import com.guru.order.dto.CommodityDTO;
 public interface CommodityService {
 
 	List<CommodityDTO> getCommodities();
-	Map<Integer, CommodityVO> getCommodityIntervals(Set<Integer> commodityIDsSet);
+
+	void updateCommodity(CommodityDTO commodityDTO);
 	
+	void deleteCommodity(CommodityDTO commodityDTO);
+	
+	void addCommodity(CommodityDTO commodityDTO);
+	
+	Map<Integer, CommodityVO> getCommodityIntervals(Set<Integer> commodityIDsSet);
+
 }

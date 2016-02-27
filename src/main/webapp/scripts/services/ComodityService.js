@@ -1,6 +1,13 @@
 app.service("ComodityService", ['$http', function($http){
 	var service = {
-		getComodities: function(){
+		getComodities:function(){
+			return $http.get("rest/commodity").then(function(response){
+				return response.data;
+			}, function(){
+				console.log("error::: ");
+			});
+		},	
+		getComoditiesDummy: function(){
 			return $http.get("scripts/services/UserService.js").then(function(response){
 				console.log("Getting comodities");
 				var comodities = [{

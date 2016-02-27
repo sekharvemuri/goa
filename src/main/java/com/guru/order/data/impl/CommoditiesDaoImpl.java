@@ -20,13 +20,27 @@ public class CommoditiesDaoImpl extends BaseDao implements CommodityDao {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<CommodityVO> getCommodities() {
-		String query = "select id, name from commodity";
-		return ((List<CommodityVO>) getJdbcTemplate().query(query, new BeanPropertyRowMapper(CommodityVO.class)));
+		String query = "select id, name from commodity order by name";
+		return ((List<CommodityVO>) getJdbcTemplate().query(query,
+				new BeanPropertyRowMapper(CommodityVO.class)));
 	}
 
 	public void addCommodity(CommodityVO commodity) throws Exception {
 		String query = "insert into commodity (name) values (?)";
-		getJdbcTemplate().update(query, new Object[] {commodity.getName()});
+		getJdbcTemplate().update(query, new Object[] { commodity.getName() });
+	}
+
+	@Override
+	public void updateCommodity(CommodityVO commodityVO) throws Exception {
+		String query = "update commodity set name = ? where id = ?";
+		getJdbcTemplate().update(query,
+				new Object[] { commodityVO.getName(), commodityVO.getId() });
+	}
+
+	@Override
+	public void deleteCommodity(int id) throws Exception {
+		String query = "delete from commodity where id = ?";
+		getJdbcTemplate().update(query, new Object[] { id });
 	}
 	
 	@Override
@@ -54,6 +68,5 @@ public class CommoditiesDaoImpl extends BaseDao implements CommodityDao {
 			
 		});
 	}
-	
 
 }

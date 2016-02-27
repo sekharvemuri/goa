@@ -13,7 +13,7 @@ var app = angular.module("CommoditiesApp", ['ngRoute', 'ui.bootstrap'])
 			controller: 'WebHomeController',
 			resolve: {
 				groupData: function(GroupService){
-					return GroupService.getGroupDataNew();
+					return GroupService.getGroupData();
 				}
 			}
 		}).when('/adhoc', {

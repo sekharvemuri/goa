@@ -23,7 +23,11 @@ public interface CommodityDao {
 	 * @throws Exception
 	 */
 	void addCommodity(CommodityVO commodity) throws Exception;
+
+	void updateCommodity(CommodityVO commodityVO) throws Exception;
+	
+	void deleteCommodity(int id) throws Exception;
 	
 	Map<Integer, CommodityVO> getCommodityIntervals(Set<Integer> commodityIDsSet);
-	
+
 }

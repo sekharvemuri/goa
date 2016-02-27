@@ -8,10 +8,10 @@
 			<th>Action</th>
 		</tr>
 		<tr ng-repeat="user in users">
-			<td ng-bind="user.userId"></td>
-			<td ng-bind="user.userName"></td>
+			<td ng-bind="user.id"></td>
+			<td ng-bind="user.name"></td>
 			<td ng-bind="user.email"></td>
-			<td ng-bind="user.mobile"></td>
+			<td ng-bind="user.mobileNumber"></td>
 			<td>
 				<div class="pointer">
                     <span class="glyphicon glyphicon-menu-hamburger" ng-click="editUser($index)"></span>
