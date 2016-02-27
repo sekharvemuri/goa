@@ -38,20 +38,20 @@ app.controller("AdhocController", ['$scope', 'groupData', '$location',
 	$scope.postOrder = function(){
 		for(var i=0; i< $scope.groups.length; i++){
 			for(var j=0; j<$scope.groups[i].orderData.length; j++){
-				if(!$scope.groups[i].orderData[j].comodityId){
+				if(!$scope.groups[i].orderData[j].commodity.name){
 					alert("Please select commodity in group "+$scope.groups[i].groupName);
 					return;
 				}
 				if(!$scope.groups[i].orderData[j].expiryDate){
-					alert("Please select expirty date for "+ $scope.groups[i].orderData[j].comodityId +" in group "+$scope.groups[i].groupName);
+					alert("Please select expirty date for "+ $scope.groups[i].orderData[j].commodity.name +" in group "+$scope.groups[i].groupName);
 					return;
 				}
 				if(!$scope.groups[i].orderData[j].orderPrice){
-					alert("Please enter order price for "+ $scope.groups[i].orderData[j].comodityId +" in group "+$scope.groups[i].groupName);
+					alert("Please enter order price for "+ $scope.groups[i].orderData[j].commodity.name +" in group "+$scope.groups[i].groupName);
 					return;
 				}
 				if(!$scope.groups[i].orderData[j].buyQuantity && !$scope.groups[i].orderData[j].sellQuantity){
-					alert("Please enter sell quantity/buy quantity for "+ $scope.groups[i].orderData[j].comodityId +" in group "+$scope.groups[i].groupName);
+					alert("Please enter sell quantity/buy quantity for "+ $scope.groups[i].orderData[j].commodity.name +" in group "+$scope.groups[i].groupName);
 					return;
 				}
 			}

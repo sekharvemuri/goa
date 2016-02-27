@@ -13,19 +13,19 @@ app.service("GroupService", ['$http', function($http){
 				var result = {"commodities":[{
 										"id":"1",
 										"name":"ALLUMINIUM",
-										"expiryDates":"01-MAR-2016,02-MAR-2016,03-MAR-2016"
+										"expiryDates":"01-MAR-16,02-MAR-16,03-MAR-16"
 									},{
 										"id":"2",
 										"name":"COPPER",
-										"expiryDates":"29-APR-2016,30-APR-2016,31-APR-2016"
+										"expiryDates":"29-APR-16,30-APR-16,31-APR-16"
 									},{
 										"id":"3",
 										"name":"LEAD",
-										"expiryDates":"01-JUN-2016,02-JUN-2016,03-JUN-2016"
+										"expiryDates":"01-JUN-16,02-JUN-16,03-JUN-16"
 									}
 								],
 								"groups":[{
-									"groupName":"A",
+									"groupName":"Group A",
 							        "users":"90129",
 									"commodities":[{
 											"name":"ALLUMINIUM"
@@ -36,33 +36,48 @@ app.service("GroupService", ['$http', function($http){
 										}
 									],
 									"orderData":[{
-							            "comodityId":"COPPER",
-							            "prevOrderValue":"361.10",
-							            "prevSellDate":"31-MAR-2016",
+							            "commodity":{
+							            	"name" : "COPPER"
+							            },
+							            "expiryDate":"29-APR-16",
+							            "prevSellValue":"361.10",
+							            "prevSellDate":"31-MAR-16",
+							            "prevSellQuantity":"1",
+							            "orderPrice":"100.00",
+							            "orderType":"BUY",
+							            "quantity":"1"
+							            
+							        },{
+							        	"commodity":{
+							            	"name" : "COPPER"
+							            },
+							            "prevSellValue":"333.10",
+							            "prevSellDate":"12-MAR-16",
 							            "prevSellQuantity":"1"
 							        },{
-							            "comodityId":"COPPER",
-							            "prevOrderValue":"333.10",
-							            "prevSellDate":"12-MAR-2016",
+							        	"commodity":{
+							            	"name" : "LEAD"
+							            },
+							            "prevSellValue":"755.70",
+							            "prevSellDate":"31-APR-16",
 							            "prevSellQuantity":"1"
 							        },{
-							            "comodityId":"LEAD",
-							            "prevOrderValue":"755.70",
-							            "prevSellDate":"31-APR-2016",
+							        	"commodity":{
+							            	"name" : "ALLUMINIUM"
+							            },
+							            "prevSellValue":"660.80",
+							            "prevSellDate":"31-MAY-16",
 							            "prevSellQuantity":"1"
 							        },{
-							            "comodityId":"ALLUMINIUM",
-							            "prevOrderValue":"660.80",
-							            "prevSellDate":"31-MAY-2016",
-							            "prevSellQuantity":"1"
-							        },{
-							            "comodityId":"ALLUMINIUM",
-							            "prevOrderValue":"638.80",
-							            "prevSellDate":"31-JAN-2016",
+							        	"commodity":{
+							            	"name" : "ALLUMINIUM"
+							            },
+							            "prevSellValue":"638.80",
+							            "prevSellDate":"31-JAN-16",
 							            "prevSellQuantity":"1"
 							        }]
 							    },{
-							        "groupName":"B",
+							        "groupName":"Group B",
 							        "users":"69757,90140,90141,90142,90127",
 									"commodities":[{
 											"name":"ALLUMINIUM"
@@ -71,19 +86,25 @@ app.service("GroupService", ['$http', function($http){
 										}
 									],
 							        "orderData":[{
-							            "comodityId":"COPPER",
-							            "prevOrderValue":"368.20",
-							            "prevSellDate":"31-DEC-2016",
+							        	"commodity":{
+							            	"name" : "COPPER"
+							            },
+							            "prevSellValue":"368.20",
+							            "prevSellDate":"31-DEC-16",
 							            "prevSellQuantity":"1"
 							        },{
-							            "comodityId":"COPPER",
-							            "prevOrderValue":"348.20",
-							            "prevSellDate":"31-OCT-2016",
+							        	"commodity":{
+							            	"name" : "COPPER"
+							            },
+							            "prevSellValue":"348.20",
+							            "prevSellDate":"31-OCT-16",
 							            "prevSellQuantity":"2"
 							        },{
-							            "comodityId":"COPPER",
-							            "prevOrderValue":"333.20",
-							            "prevSellDate":"31-AUG-2016",
+							        	"commodity":{
+							            	"name" : "COPPER"
+							            },
+							            "prevSellValue":"333.20",
+							            "prevSellDate":"31-AUG-16",
 							            "prevSellQuantity":"3"
 							        }]
 							    }]

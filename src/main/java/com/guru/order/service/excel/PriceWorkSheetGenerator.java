@@ -26,89 +26,92 @@ import com.guru.order.utils.DateUtils;
 
 @Component
 public class PriceWorkSheetGenerator extends BasePoiUtil {
-	
+
 	private int snoColNum = 0;
 	private int symbolColNum = 1;
 	private int expiryDateColNum = 2;
 	private int prevPriceColNum = 3;
 	private int prevDateColNum = 4;
 	private int prevQtyColNum = 5;
-	private int orderPriceColNum = 6; 
+	private int orderPriceColNum = 6;
 	private int buyColNum = 7;
 	private int sellColNum = 8;
-	
+
 	private HSSFCellStyle boldStyle;
 	private HSSFCellStyle centerStyle;
-	
-	public void generatePriceWorkOrderSheet(List<GroupDTO> groupsList, String filePath) throws IOException {
+
+	public void generatePriceWorkOrderSheet(List<GroupDTO> groupsList,
+			String filePath) throws IOException {
 		if (CollectionUtils.isEmpty(groupsList)) {
 			return;
 		}
-		
+
 		sortGroupsByGroupName(groupsList);
-		
+
 		int rownum = -1;
 		HSSFWorkbook workBook = geNewtWorkBook();
 		HSSFSheet sheet = workBook.createSheet("Sheet1");
 		boldStyle = getStyle(workBook, true);
-		
+
 		centerStyle = workBook.createCellStyle();
 		centerStyle.setAlignment(CellStyle.ALIGN_CENTER);
 		centerStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
-		
+
 		setColumnWidth(sheet);
 		addReportHeaderRow(sheet, ++rownum);
 		addEmptyRow(sheet, ++rownum);
-		
+
 		for (GroupDTO groupDto : groupsList) {
 			addGroupNameRow(sheet, ++rownum, groupDto);
-			//addEmptyRow(sheet, ++rownum);
+			// addEmptyRow(sheet, ++rownum);
 			rownum = addGroupHeaderRow(sheet, rownum);
-			
+
 			if (CollectionUtils.isEmpty(groupDto.getOrderData())) {
 				continue;
 			}
-			
-			Map<String, List<OrderData>> ordersMap = parseBySymbol(groupDto.getOrderData());
+
+			Map<String, List<OrderData>> ordersMap = parseBySymbol(groupDto
+					.getOrderData());
 			List<String> symbolsList = new ArrayList<String>(ordersMap.keySet());
 			Collections.sort(symbolsList);
-			
+
 			int sno = 0;
 			for (String symbol : symbolsList) {
 				List<OrderData> subList = ordersMap.get(symbol);
 				if (CollectionUtils.isEmpty(subList)) {
 					continue;
 				}
-				
+
 				sortOrdersByTypeAndExpiryDate(subList);
-				
+
 				++rownum;
-				sheet.addMergedRegion(new CellRangeAddress(rownum, (rownum + subList.size() - 1), snoColNum, snoColNum));
-				sheet.addMergedRegion(new CellRangeAddress(rownum, (rownum + subList.size() - 1), symbolColNum, symbolColNum));
-				
+				sheet.addMergedRegion(new CellRangeAddress(rownum, (rownum
+						+ subList.size() - 1), snoColNum, snoColNum));
+				sheet.addMergedRegion(new CellRangeAddress(rownum, (rownum
+						+ subList.size() - 1), symbolColNum, symbolColNum));
+
 				HSSFRow row = createRow(sheet, rownum);
-				HSSFCell snoCell = addStringCell(row, snoColNum, String.valueOf(++sno));
+				HSSFCell snoCell = addStringCell(row, snoColNum,
+						String.valueOf(++sno));
 				snoCell.setCellStyle(centerStyle);
 				HSSFCell symbolCell = addStringCell(row, symbolColNum, symbol);
 				symbolCell.setCellStyle(centerStyle);
-				
+
 				OrderData order = subList.get(0);
 				addOrderDataRow(row, order);
-				
-				for (int i=1; i<subList.size(); i++) {
+
+				for (int i = 1; i < subList.size(); i++) {
 					order = subList.get(i);
 					row = createRow(sheet, ++rownum);
 					addOrderDataRow(row, order);
 				}
 			}
-			
+
 			addEmptyRow(sheet, ++rownum);
 		}
-		
+
 		saveToFile(workBook, filePath);
 	}
-
-
 
 	private void setColumnWidth(HSSFSheet sheet) {
 		sheet.setColumnWidth(snoColNum, 2000);
@@ -122,8 +125,6 @@ public class PriceWorkSheetGenerator extends BasePoiUtil {
 		sheet.setColumnWidth(sellColNum, 2000);
 	}
 
-
-
 	private void sortOrdersByTypeAndExpiryDate(List<OrderData> subList) {
 		Collections.sort(subList, new Comparator<OrderData>() {
 
@@ -135,38 +136,40 @@ public class PriceWorkSheetGenerator extends BasePoiUtil {
 				if (o1 == null) {
 					return -1;
 				}
-				int compare = o2.getOption().compareTo(o1.getOption());
+				int compare = o2.getOrderType().compareTo(o1.getOrderType());
 				if (compare != 0) {
-					compare = (int) (o1.getExpiryDate() - o2.getExpiryDate());
+					compare = (o1.getExpiryDate() != null) ? (o1
+							.getExpiryDate().compareTo(o2.getExpiryDate()))
+							: -1;
 				}
 				return compare;
 			}
 		});
 	}
 
-
-
 	private void addOrderDataRow(HSSFRow row, OrderData order) {
-		addStringCell(row, expiryDateColNum, DateUtils.formatToDDMMMYY(order.getExpiryDate()));
-		addStringCell(row, prevPriceColNum, String.valueOf(order.getLastSoldValue()));
-		addStringCell(row, prevDateColNum, ""); // TODO:
-		addStringCell(row, prevQtyColNum, String.valueOf(order.getLastSoldQuantity()));
-		addStringCell(row, orderPriceColNum, String.valueOf(order.getOrderValue()));
+		addStringCell(row, expiryDateColNum, order.getExpiryDate());
+		addStringCell(row, prevPriceColNum,
+				String.valueOf(order.getPrevSellValue()));
+		addStringCell(row, prevDateColNum, order.getPrevSellDate());
+		addStringCell(row, prevQtyColNum,
+				String.valueOf(order.getPrevSellQuantity()));
+		addStringCell(row, orderPriceColNum,
+				String.valueOf(order.getOrderPrice()));
 		String buyQty = "-";
 		String sellQty = "-";
-		if (Constants.BUY_SELL_OPTION.BUY.getOptionType().equals(order.getOption())) {
+		if (Constants.BUY_SELL_OPTION.BUY.getOptionType().equals(
+				order.getOrderType())) {
 			buyQty = String.valueOf(order.getQuantity());
-		}
-		else {
+		} else {
 			sellQty = String.valueOf(order.getQuantity());
 		}
 		addStringCell(row, buyColNum, buyQty);
 		addStringCell(row, sellColNum, sellQty);
 	}
 
-
-
-	private Map<String, List<OrderData>> parseBySymbol(List<OrderData> ordersList) {
+	private Map<String, List<OrderData>> parseBySymbol(
+			List<OrderData> ordersList) {
 		Map<String, List<OrderData>> map = new HashMap<String, List<OrderData>>();
 		for (OrderData order : ordersList) {
 			List<OrderData> subList = map.get(order.getCommodity().getName());
@@ -181,10 +184,12 @@ public class PriceWorkSheetGenerator extends BasePoiUtil {
 
 	private int addGroupHeaderRow(HSSFSheet sheet, int rownum) {
 		HSSFRow row1 = sheet.createRow(++rownum);
-		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, prevPriceColNum, prevQtyColNum));
-		addStringCell(row1, prevPriceColNum, "Existing Sell Position", boldStyle);
-		
-		HSSFRow row2  = sheet.createRow(++rownum);
+		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum,
+				prevPriceColNum, prevQtyColNum));
+		addStringCell(row1, prevPriceColNum, "Existing Sell Position",
+				boldStyle);
+
+		HSSFRow row2 = sheet.createRow(++rownum);
 		addStringCell(row2, snoColNum, "Sl no", boldStyle);
 		addStringCell(row2, symbolColNum, "Symbol", boldStyle);
 		addStringCell(row2, expiryDateColNum, "Expiry Date", boldStyle);
@@ -201,18 +206,21 @@ public class PriceWorkSheetGenerator extends BasePoiUtil {
 		HSSFRow row = sheet.createRow(rownum);
 		addEmptyCell(row, 0);
 		addStringCell(row, 1, groupDto.getGroupName(), boldStyle);
-		
+
 		String idsData = "ID NO's. " + groupDto.getUsers();
 		addStringCell(row, 2, idsData);
 	}
-	
+
 	private void addReportHeaderRow(HSSFSheet sheet, int rownum) {
-		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, snoColNum, prevDateColNum));
-		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, orderPriceColNum, sellColNum));
-		
+		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, snoColNum,
+				prevDateColNum));
+		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum,
+				orderPriceColNum, sellColNum));
+
 		HSSFRow row = sheet.createRow(rownum);
 		addStringCell(row, snoColNum, "PRICE WORK OUT SHEET", boldStyle);
-		addStringCell(row, orderPriceColNum, "Date: " + DateUtils.formatToDDMMYYYY(new Date()), boldStyle);
+		addStringCell(row, orderPriceColNum,
+				"Date: " + DateUtils.formatToDDMMYYYY(new Date()), boldStyle);
 		addEmptyCell(row, symbolColNum);
 		addEmptyCell(row, expiryDateColNum);
 		addEmptyCell(row, prevPriceColNum);
@@ -221,7 +229,7 @@ public class PriceWorkSheetGenerator extends BasePoiUtil {
 		addEmptyCell(row, buyColNum);
 		addEmptyCell(row, sellColNum);
 	}
-	
+
 	private void sortGroupsByGroupName(List<GroupDTO> groupsList) {
 		Collections.sort(groupsList, new Comparator<GroupDTO>() {
 

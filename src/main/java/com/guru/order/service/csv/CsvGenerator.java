@@ -14,7 +14,6 @@ import com.guru.order.dto.GroupDTO;
 import com.guru.order.dto.OrderDTO;
 import com.guru.order.dto.OrderData;
 import com.guru.order.utils.Constants;
-import com.guru.order.utils.DateUtils;
 
 @Component
 public class CsvGenerator {
@@ -59,7 +58,7 @@ public class CsvGenerator {
 				for (OrderData orderData : group.getOrderData()) {
 					String[] candidates = group.getUsers().split(",");
 					
-					if (Constants.BUY_SELL_OPTION.BUY.getOptionType().equals(orderData.getOption())) {
+					if (Constants.BUY_SELL_OPTION.BUY.getOptionType().equals(orderData.getOrderType())) {
 						for (String canId : candidates) {
 							buyData.add(new String[] {
 									String.valueOf(++buyRefNum),
@@ -72,10 +71,9 @@ public class CsvGenerator {
 									"Instrument Name",
 									String.valueOf(orderData.getCommodity()
 											.getId()),
-									DateUtils.formatToDDMMMYY(orderData
-											.getExpiryDate()), "", "", "1", "",
+									orderData.getExpiryDate(), "", "", "1", "",
 									"", "",
-									String.valueOf(orderData.getOrderValue()),
+									String.valueOf(orderData.getOrderPrice()),
 									"",
 									String.valueOf(orderData.getQuantity()),
 									"", "", "", canId, "Product Type", "",
@@ -95,10 +93,9 @@ public class CsvGenerator {
 									"Instrument Name",
 									String.valueOf(orderData.getCommodity()
 											.getId()),
-									DateUtils.formatToDDMMMYY(orderData
-											.getExpiryDate()), "", "", "1", "",
+									orderData.getExpiryDate(), "", "", "1", "",
 									"", "",
-									String.valueOf(orderData.getOrderValue()),
+									String.valueOf(orderData.getOrderPrice()),
 									"",
 									String.valueOf(orderData.getQuantity()),
 									"", "", "", canId, "Product Type", "",

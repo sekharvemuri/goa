@@ -2,8 +2,9 @@
 	<div class="row" ng-init="groupIndex = $index">
 		<div class="col-md-11" style="padding: 25px;">
 			<div class="bold">
-				<div>Group <span ng-bind="group.groupName"></span></div>
 				<div>
+					<span ng-bind="group.groupName"></span>
+					&nbsp;
 					Users: <span ng-bind="group.users"></span>
 					(<span ng-bind="getUserCount(group.users)"></span>)
 				</div>
@@ -18,13 +19,13 @@
 				<tbody>
 					<tr ng-repeat="order in group.orderData">
 						<td>
-							<select style="width: 100%;" ng-model="order.comodityId" ng-options="commodity.name as commodity.name for commodity in group.commodities"></select>
+							<select style="width: 100%;" ng-model="order.comodity.name" ng-options="commodity.name as commodity.name for commodity in group.commodities"></select>
 						</td>
 						<td>
-							<select style="width: 100%;" ng-model="order.expiryDate" ng-options="expiryDate as expiryDate for expiryDate in getExpiryDates(order.comodityId)"></select>
+							<select style="width: 100%;" ng-model="order.expiryDate" ng-options="expiryDate as expiryDate for expiryDate in getExpiryDates(order.comodity.name)"></select>
 						</td>
 						<td class="text-center">
-							<div style="display: inline-block;" ng-bind="order.prevOrderValue"></div>
+							<div style="display: inline-block;" ng-bind="order.prevSellValue"></div>
 						</td>
 						<td class="text-center">
 							<div style="display: inline-block;" ng-bind="order.prevSellDate"></div>
@@ -37,14 +38,17 @@
 								<input type="text" ng-keypress="formatPrice($event, order.orderPrice)" ng-model="order.orderPrice" style="width: 90%; margin: 0 auto;"/>
 							</div>
 						</td>
-						<td class="text-center editable-fields price-field">
+						<td class="text-center">
 							<div style="display: inline-block;">
-								<input type="text" ng-keypress="formatNumber($event)" ng-model="order.buyQuantity" style="width: 90%; margin: 0 auto;" placeholder="Buy"/>
+								<select style="width: 100%;" ng-model="order.orderType">
+									<option>BUY</option>
+									<option>SELL</option>
+								</select>
 							</div>
 						</td>
 						<td class="text-center editable-fields price-field">
 							<div style="display: inline-block;">
-								<input type="text" ng-keypress="formatNumber($event)" ng-model="order.sellQuantity" style="width: 90%; margin: 0 auto;" placeholder="Sell"/>
+								<input type="text" ng-keypress="formatNumber($event)" ng-model="order.quantity" style="width: 90%; margin: 0 auto;" placeholder="Sell"/>
 							</div>
 						</td>
 						<td class="text-center">
