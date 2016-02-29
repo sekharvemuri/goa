@@ -2,6 +2,7 @@ package com.guru.order.data.impl;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,13 @@ public class CommoditiesDaoImpl extends BaseDao implements CommodityDao {
 			}
 			
 		});
+	}
+
+	@Override
+	public List<Date> getExpiryDates(int commodityId) {
+		String query = "select expiry_date as expiryDate from commodity_expiry_date where cmdt_id=? order by expiry_date";
+		Object[] params = new Object[] {commodityId };
+		return getJdbcTemplate().queryForList(query, params, Date.class);
 	}
 
 }
