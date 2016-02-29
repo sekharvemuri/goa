@@ -1,6 +1,9 @@
 package com.guru.order.data.vo;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class CommodityVO implements Serializable {
 
@@ -11,6 +14,7 @@ public class CommodityVO implements Serializable {
 	private float subInterval1;
 	private float subInterval2;
 	private float subInterval3;
+	private List<Date> expiryDates;
 
 	public CommodityVO() {
 		super();
@@ -70,4 +74,20 @@ public class CommodityVO implements Serializable {
 		this.subInterval3 = subInterval3;
 	}
 
+	public List<Date> getExpiryDates() {
+		return expiryDates;
+	}
+
+	public void setExpiryDates(List<Date> expiryDates) {
+		this.expiryDates = expiryDates;
+	}
+
+	public void addExpiryDate(Date expiryDate) {
+		if (expiryDates == null) {
+			expiryDates = new ArrayList<Date>();
+		}
+		if (expiryDate != null) {
+			expiryDates.add(expiryDate);
+		}
+	}
 }

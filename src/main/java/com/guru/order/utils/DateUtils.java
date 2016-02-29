@@ -100,4 +100,8 @@ public class DateUtils {
 		}
 		return null;
 	}
+
+	public static String formatToDDMMMYY(Date date) {
+		return sdf_dd_MMM_yy.format(date);
+	}
 }

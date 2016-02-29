@@ -169,7 +169,7 @@ public class OrderServiceImpl implements OrderService {
 				workOrderVO.getCommodityId(), workOrderVO.getCommodityName());
 		orderData.setCommodity(commodityDTO);
 		if (workOrderVO.getExpiryDate() != null) {
-			orderData.setExpiryDate(DateUtils.formatToDDMMMYYYY(workOrderVO.getExpiryDate()));
+			orderData.setExpiryDate(DateUtils.formatToDDMMMYY(workOrderVO.getExpiryDate().getTime()));
 		}
 		orderData.setWorkOrderId(workOrderVO.getId());
 		orderData.setOrderType(workOrderVO.getOrderType());
