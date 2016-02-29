@@ -21,6 +21,9 @@ public class CommodityServiceImpl implements CommodityService {
 	public List<CommodityDTO> getCommodities() {
 		List<CommodityVO> commodityVOs = null;
 		commodityVOs = commodityDao.getCommodities();
+		for (CommodityVO listItem : commodityVOs) {
+			listItem.setExpiryDates(commodityDao.getExpiryDates(listItem.getId()));
+		}
 		return CommodityConverter.getCommodities(commodityVOs);
 	}
 
