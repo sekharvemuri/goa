@@ -1,5 +1,6 @@
 package com.guru.order.data;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,5 +30,7 @@ public interface CommodityDao {
 	void deleteCommodity(int id) throws Exception;
 	
 	Map<Integer, CommodityVO> getCommodityIntervals(Set<Integer> commodityIDsSet);
+
+	List<Date> getExpiryDates(int commodityId);
 
 }
