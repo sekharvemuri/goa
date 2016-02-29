@@ -1,3 +1,72 @@
 <div class="col-md-12 tab-container">
-	This is types.html page
+	<table class="table" style="width: 75%;">
+		<tr>
+			<th>Id</th>
+			<th>Type name</th>
+			<th>Subtypes</th>
+			<th>Action</th>
+		</tr>
+		<tr ng-repeat="type in types">
+			<td ng-bind="type.typeId"></td>
+			<td ng-bind="type.typeName"></td>
+			<td>
+				<div ng-repeat="subType in getSubtypes(type.subTypes)" ng-bind="subType"></div>
+			</td>
+			<td>
+				<div class="pointer">
+                    <span class="glyphicon glyphicon-menu-hamburger" ng-click="editType($index)"></span>
+                    <span class="glyphicon glyphicon-remove" ng-click="deleteType($index)"></span>
+                </div>
+			</td>
+		</tr>
+	</table>
+	
+	<div class="btn btn-success" ng-click="addType()">Add type</div>
 </div>
+
+<script type="text/ng-template" id="type-modal.html">
+    <div class="modal-header">
+        <h3 class="modal-title" ng-bind="heading"></h3>
+    </div>
+    <div class="modal-body">
+		<div class="row popup-row">
+            <div class="col-md-12">
+				<div class="row" style="margin-bottom: 10px;">
+                	<div class="col-md-6 text-right popup-label">
+                    	<label for="comodityFamily-name">Type name:</label>
+                	</div>
+                	<div class="col-md-6">
+                    	<input type="text" class="form-control" id="comodityFamily-name" ng-model="type.typeName"/>
+                	</div>
+				</div>
+				
+				<div class="row" style="margin-bottom: 10px;">
+					<div class="col-md-5">
+                    	<select size=5 style="width: 100%; height: 75px;" ng-model="selectedSubtype">
+							<option ng-repeat="subtype in leftSubtypes" value="{{subtype}}" ng-bind="subtype"></option>
+						</select>
+                	</div>
+					<div class="col-md-1">
+						<div style="margin-bottom: 10px;">
+                    		<button ng-click="addSubtype()">></button>
+						</div>
+						<br/>
+						<div style="margin-bottom: 10px;">
+                    		<button ng-click="removeSubtype()"><</button>
+						</div>
+                	</div>
+					<div class="col-md-5">
+                    	<select size=5 style="width: 100%; height: 75px;" ng-model="selectedSubtypeToDel">
+							<option ng-repeat="subtype in rightSubtypes" value="{{subtype}}" ng-bind="subtype"></option>
+						</select>
+                	</div>
+				</div>
+				
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">Save</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+    </div>
+</script>

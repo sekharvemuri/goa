@@ -37,6 +37,7 @@ app.service("GroupService", ['$http', function($http){
 									],
 									"orderData":[{
 							            "commodity":{
+							            	"id": 1,
 							            	"name" : "COPPER"
 							            },
 							            "expiryDate":"29-APR-16",
@@ -58,9 +59,13 @@ app.service("GroupService", ['$http', function($http){
 							        	"commodity":{
 							            	"name" : "LEAD"
 							            },
+							            "expiryDate":"01-JUN-16",
 							            "prevSellValue":"755.70",
 							            "prevSellDate":"31-APR-16",
-							            "prevSellQuantity":"1"
+							            "prevSellQuantity":"1",
+							            "orderPrice":"100.00",
+							            "orderType":"SELL",
+							            "quantity":"1"
 							        },{
 							        	"commodity":{
 							            	"name" : "ALLUMINIUM"

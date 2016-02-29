@@ -56,7 +56,15 @@ var app = angular.module("CommoditiesApp", ['ngRoute', 'ui.bootstrap'])
 			}
 		}).when('/types', {
 			templateUrl: './views/types.html',
-			controller: 'TypeController'
+			controller: 'TypeController',
+			resolve: {
+				types: function(TypeService){
+					return TypeService.getTypes();
+				},
+				subtypes: function(TypeService){
+					return TypeService.getSubtypes();
+				}
+			}
 		}).when('/users', {
 			templateUrl: './views/users.html',
 			controller: 'UserController',
