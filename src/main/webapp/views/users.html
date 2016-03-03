@@ -32,10 +32,21 @@
 		<div class="row popup-row">
             <div class="col-md-12">
                 <div class="col-md-6 text-right popup-label">
+                    <label for="name">User id:</label>
+                </div>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="name" ng-model="user.id"/>
+                </div>
+            </div>
+        </div>
+
+		<div class="row popup-row">
+            <div class="col-md-12">
+                <div class="col-md-6 text-right popup-label">
                     <label for="name">Name:</label>
                 </div>
                 <div class="col-md-6">
-                    <input type="text" class="form-control" id="name" ng-model="user.userName"/>
+                    <input type="text" class="form-control" id="name" ng-model="user.name"/>
                 </div>
             </div>
         </div>
@@ -57,7 +68,7 @@
                     <label for="mobile">Mobile:</label>
                 </div>
                 <div class="col-md-6">
-                    <input type="text" class="form-control" id="mobile" ng-model="user.mobile"/>
+                    <input type="text" class="form-control" id="mobile" ng-model="user.mobileNumber"/>
                 </div>
             </div>
         </div>

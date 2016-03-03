@@ -1,9 +1,8 @@
-app.controller("UserController", ['$scope', '$uibModal', 'users', 'UserService', '$location',
-  	function($scope, $uibModal, users, UserService, $location){
+app.controller("UserController", ['$scope', '$uibModal', 'users', 'UserService', '$location', '$route',
+  	function($scope, $uibModal, users, UserService, $location, $route){
   		$scope.users = users || [];
   		
   		$scope.editUser = function(index){
-  			console.log("Editing user: ", index);
   			var modalInstance = $uibModal.open({
   		    	animation: true,
   		    	templateUrl: 'user-modal.html',
@@ -19,19 +18,18 @@ app.controller("UserController", ['$scope', '$uibModal', 'users', 'UserService',
   		    });
 
   		    modalInstance.result.then(function (user) {
-  		    	if(user && user.userName){
-  		    		console.log("User after editing: ", user.userName);
-  		    		UserService.updateUser($scope.users[index]).then(function(response){
-  						$location.path("users");
+  		    	if(user && user.name){
+  		    		console.log("User after editing: ", user.name);
+  		    		UserService.updateUser(user).then(function(response){
+  		    			$route.reload();
   					});
   		    	}
   		    });
   		}
   		
   		$scope.deleteUser = function(index){
-  			console.log("Deleting user: ", index);
   			UserService.deleteUser($scope.users[index]).then(function(response){
-  				$location.path("users");
+  				$route.reload();
   			});
   		}
   		
@@ -51,10 +49,10 @@ app.controller("UserController", ['$scope', '$uibModal', 'users', 'UserService',
   		    });
 
   		    modalInstance.result.then(function (user) {
-  		    	if(user && user.userName){
+  		    	if(user && user.name){
   		    		UserService.createUser(user).then(function(){
   		    			$scope.users.push(user);
-  		    			$location.path("users");
+  		    			$route.reload();
   		    		});
   		    	}
   		    });

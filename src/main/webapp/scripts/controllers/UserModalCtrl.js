@@ -3,10 +3,9 @@ app.controller("UserModalCtrl", function($scope, $uibModalInstance, option, user
 	if(option == 'NEW'){	
 		$scope.heading = "Create user";
 		$scope.user = {
-			"userId" : 0,
-			"userName" : "",
+			"name" : "",
 			"email": "",
-			"mobile": ""
+			"mobileNumber": ""
 		};
 	} else{
 		$scope.heading = "Edit user";
@@ -14,7 +13,7 @@ app.controller("UserModalCtrl", function($scope, $uibModalInstance, option, user
 	}
 	
 	$scope.ok = function () {
-		if(!$scope.user.userName){
+		if(!$scope.user.name){
 			$uibModalInstance.dismiss('cancel');
 		}
     	$uibModalInstance.close($scope.user);

@@ -34,33 +34,18 @@ app.service("UserService", ['$http', function($http){
 		},
 		
 		createUser: function(user){
-			var config = {
-				data: user,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			return $http.post("rest/user", config).then(function(response){
-				console.log("Create user", user);
+			return $http.post("rest/user/add", user).then(function(response){
 				return response;
 			}, function(error){
-				console.log("Create user", user);
 				console.log(error);
 			});
 		},
 		
 		updateUser: function(user){
-			var config = {
-				data: user,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			return $http.put("rest/user", config).then(function(response){
-				console.log("Update user", user);
+			console.log(user);
+			return $http.put("rest/user/update", user).then(function(response){
 				return response;
 			}, function(error){
-				console.log("Update user", user);
 				console.log(error);
 			});
 		},
@@ -72,7 +57,7 @@ app.service("UserService", ['$http', function($http){
 					"Content-Type": "application/json"
 				}
 			};
-			return $http.delete("rest/user", config).then(function(response){
+			return $http.delete("rest/user/delete", config).then(function(response){
 				console.log("Delete user", user);
 				return response;
 			}, function(error){
