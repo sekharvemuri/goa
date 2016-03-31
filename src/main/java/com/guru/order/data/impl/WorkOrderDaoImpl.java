@@ -421,23 +421,23 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 		return getJdbcTemplate().queryForList(query, params, Integer.class);
 	}
 
-	@Override
-	public Map<Integer, Integer> getGroupCommodityIdsMap(int commodityFamilyId) {
-		String query = "select g.id as groupId, c.id as commodityId from groups g, commodity c, group_commodity gc where g.id=gc.group_id and c.id=gc.cmdty_id and c.cmdt_family_id=?";
-		Object[] params = new Object[] {commodityFamilyId};
-		return getJdbcTemplate().query(query, params, new ResultSetExtractor<Map<Integer, Integer>> () {
-
-			@Override
-			public Map<Integer, Integer> extractData(ResultSet rs) throws SQLException, DataAccessException {
-				Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-				while (rs.next()) {
-					map.put(rs.getInt("groupId"), rs.getInt("commodityId"));
-				}
-				return map;
-			}
-			
-		});
-	}
+//	@Override
+//	public Map<Integer, Integer> getGroupCommodityIdsMap(int commodityFamilyId) {
+//		String query = "select g.id as groupId, c.id as commodityId from groups g, commodity c, group_commodity gc where g.id=gc.group_id and c.id=gc.cmdty_id and c.cmdt_family_id=?";
+//		Object[] params = new Object[] {commodityFamilyId};
+//		return getJdbcTemplate().query(query, params, new ResultSetExtractor<Map<Integer, Integer>> () {
+//
+//			@Override
+//			public Map<Integer, Integer> extractData(ResultSet rs) throws SQLException, DataAccessException {
+//				Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+//				while (rs.next()) {
+//					map.put(rs.getInt("groupId"), rs.getInt("commodityId"));
+//				}
+//				return map;
+//			}
+//			
+//		});
+//	}
 
 	@Override
 	public void updateRecentTradedSubTypes(List<RecentTradedSubTypeVO> recentTradedSubTypes) {
@@ -511,6 +511,15 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 					return tradedList.size();
 				}
 			});
+	}
+
+	@Override
+	public boolean checkGroupHasOpenSellPosition(Integer groupId, int commodityFamilyId) {
+		String query = "select count(1) from work_order wo, commodity c, commodity_family cf where wo.cmdty_id=c.id and c.cmdt_family_id=cf.id "
+				+ " and wo.group_id=? and cf.id=? and order_type='BUY' and executed_amount is null";
+		Object[] params = new Object[] {groupId, commodityFamilyId};
+		int rowCount = getJdbcTemplate().queryForObject(query, params, Integer.class);
+		return (rowCount > 0);
 	}
 
 }

@@ -413,8 +413,15 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public void createNextOrders() {
 		List<WorkOrderVO> nextOrdersList = new ArrayList<WorkOrderVO>();
+		List<WorkOrderVO> deleteOrdersList = new ArrayList<WorkOrderVO>();
+		
 		processNextBuyOrdersForSellTrades(nextOrdersList);
-		processNextSellOrdersForBuyTrades(nextOrdersList);
+		processNextSellOrdersForBuyTrades(nextOrdersList, deleteOrdersList);
+		
+		if (CollectionUtils.isNotEmpty(deleteOrdersList)) {
+			//TODO: workOrderDao.deleteWorkOrders(deleteOrdersList);
+		}
+		
 		if (CollectionUtils.isNotEmpty(nextOrdersList)) {
 			workOrderDao.saveNextWorkOrders(nextOrdersList);
 		}
@@ -497,7 +504,7 @@ public class OrderServiceImpl implements OrderService {
 		return commodityIDsSet;
 	}
 	
-	private void processNextSellOrdersForBuyTrades(List<WorkOrderVO> nextOrdersList) {
+	private void processNextSellOrdersForBuyTrades(List<WorkOrderVO> nextOrdersList, List<WorkOrderVO> deleteOrdersList) {
 		List<WorkOrderVO> tradedList = workOrderDao.getTradedOrders("BUY");
 		if (CollectionUtils.isEmpty(tradedList)) {
 			return;
@@ -532,20 +539,21 @@ public class OrderServiceImpl implements OrderService {
 					for (Integer tradedSubTypeId : recentTradedSubTypesList) {
 						// get the groups in that sub type.
 						List<Integer> groupsListBySubType = groupsDao.getGroupsBySubTypeId(tradedSubTypeId);
-						Map<Integer, Integer> groupCommodityIdMap = workOrderDao.getGroupCommodityIdsMap(tradedVo.getCommodityFamilyId());
+						// Map<Integer, Integer> groupCommodityIdMap = workOrderDao.getGroupCommodityIdsMap(tradedVo.getCommodityFamilyId());
 						
 						// iterate through the groups.
 						for (Integer groupIdBySubType : groupsListBySubType) {
 							// if mapping between group and any of the commodity in that family exists.
 
 							// check for any SELL positions for the Group-Commodity
-							if (groupCommodityIdMap.get(groupIdBySubType) != null) {
+							boolean isGroupHasOpenSellPosition = workOrderDao.checkGroupHasOpenSellPosition(groupIdBySubType, tradedVo.getCommodityFamilyId());
+							if (!isGroupHasOpenSellPosition) {
 								// if not there, place the SELL order.
 								Float interval = (iter == 0) ? commodityVO.getSubInterval2() : commodityVO.getSubInterval3();
 								generateNextOrders(tradedVo, groupCandidatesMap.get(tradedVo.getGroupName()), interval, "SELL", nextOrdersList);
 							}
 						}
-						
+						// increment the 'iter' for next level sub-type
 						iter++;
 					}
 				}

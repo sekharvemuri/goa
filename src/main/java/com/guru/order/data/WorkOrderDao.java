@@ -30,8 +30,9 @@ public interface WorkOrderDao {
 	void saveNextWorkOrders(List<WorkOrderVO> nextSellOrders);
 	List<Integer> getAllSubTypeIdsByGroupId(int groupId);
 	List<Integer> getRecentTradedSubTypes(List<Integer> subTypeIdsList, int groupId, int commodityId);
-	Map<Integer, Integer> getGroupCommodityIdsMap(int commodityFamilyId);
+	//Map<Integer, Integer> getGroupCommodityIdsMap(int commodityFamilyId);
 	void updateRecentTradedSubTypes(List<RecentTradedSubTypeVO> recentTradedSubTypes);
 	void saveMiscTradedItems(List<OrderConfirmationDTO> tradedList, Calendar tradedTime);
+	boolean checkGroupHasOpenSellPosition(Integer groupIdBySubType, int commodityFamilyId);
 	
 }
