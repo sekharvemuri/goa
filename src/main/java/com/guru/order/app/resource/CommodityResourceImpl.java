@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.guru.order.dto.CommodityDTO;
+import com.guru.order.dto.CommodityFamilyDTO;
 import com.guru.order.service.CommodityService;
 
 /**
@@ -44,7 +45,14 @@ public class CommodityResourceImpl {
 	@GET
 	@Path("/")
 	public Response getCommodities(@Context ServletContext context) {
-		List<CommodityDTO> dtos = commodityService.getCommodities();
+		List<CommodityDTO> dtos = commodityService.getCommoditiesWithExpiryDates();
+		return Response.ok(dtos).build();
+	}
+	
+	@GET
+	@Path("/family")
+	public Response getCommodityFamilies(@Context ServletContext context) {
+		List<CommodityFamilyDTO> dtos = commodityService.getCommodityFamilies();
 		return Response.ok(dtos).build();
 	}
 

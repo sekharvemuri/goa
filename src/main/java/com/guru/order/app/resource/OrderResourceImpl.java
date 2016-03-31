@@ -84,7 +84,7 @@ public class OrderResourceImpl {
 				InputStream istream = inputPart
 						.getBody(InputStream.class, null);
 				Reader reader = new InputStreamReader(istream);
-				orderService.saveOrderConfirmation(reader);
+				orderService.saveTradedOrders(reader);
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}
