@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.guru.order.data.GroupsDao;
 import com.guru.order.data.vo.CandidateVO;
 import com.guru.order.data.vo.CommodityVO;
+import com.guru.order.data.vo.GroupCommodityVO;
 import com.guru.order.data.vo.GroupVO;
 import com.guru.order.data.vo.SubTypeVO;
 
@@ -31,14 +34,22 @@ public class GroupsDaoImpl extends BaseDao implements GroupsDao {
 	@Override
 	public List<GroupVO> getGroups() {
 		String query = "select id, name from groups order by name";
-		return ((List<GroupVO>) getJdbcTemplate().query(query, new BeanPropertyRowMapper(GroupVO.class)));
+		try {
+			return ((List<GroupVO>) getJdbcTemplate().query(query, new BeanPropertyRowMapper(GroupVO.class)));
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public List<GroupVO> getGroupsWithCandidates() {
 		String query = "select id, name from groups g, group_candidates gc where g.id=gc.group_id group by id, name order by name";
-		return ((List<GroupVO>) getJdbcTemplate().query(query, new BeanPropertyRowMapper(GroupVO.class)));
+		try {
+			return ((List<GroupVO>) getJdbcTemplate().query(query, new BeanPropertyRowMapper(GroupVO.class)));
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	@Override
@@ -221,8 +232,69 @@ public class GroupsDaoImpl extends BaseDao implements GroupsDao {
 	}
 
 	@Override
-	public SubTypeVO getSubType(Long groupId) {
+	public SubTypeVO getSubType(int groupId) {
 		String query = "select id, type_id as typeId, name from sub_types st, sub_type_groups stg where st.id=stg.sub_type_id and stg.group_id=?";
-		return getJdbcTemplate().queryForObject(query, new Object[] {groupId}, new BeanPropertyRowMapper<SubTypeVO>(SubTypeVO.class));
+		return getJdbcTemplate().query(query, new Object[] {groupId}, new ResultSetExtractor<SubTypeVO>() {
+
+			@Override
+			public SubTypeVO extractData(ResultSet rs) throws SQLException,
+					DataAccessException {
+				SubTypeVO subTypeVO = null;
+				if (rs.next()) {
+					subTypeVO = new SubTypeVO();
+					subTypeVO.setId(rs.getInt("id"));
+					subTypeVO.setTypeId(rs.getInt("typeId"));
+					subTypeVO.setName(rs.getString("name"));
+				}
+				return subTypeVO;
+			}
+		});
+	}
+
+	@Override
+	public List<Integer> getGroupsBySubTypeId(Integer subTypeId) {
+		String query = "select group_id from sub_type_groups where sub_type_id=?";
+		return getJdbcTemplate().queryForList(query, new Object[] {subTypeId}, Integer.class);
+	}
+
+	@Override
+	public void saveCommodity(String commodityName, Calendar expiryDate) {
+		String query = "insert into commodity_expiry_date (cmdt_id, expiry_date) values ("
+				+ " (select id from commodity where name=?), ?)";
+		Object[] params = new Object[] {commodityName, expiryDate.getTime()};
+		try {
+			getJdbcTemplate().update(query, params);
+		} catch (Exception e) {
+			System.out.println(String.format("commodity_expiry_date exists for %s, %s", commodityName, expiryDate.getTime()));
+		}
+	}
+
+	@Override
+	public GroupCommodityVO getGroupCommodityDetails(int groupId,
+			int commodityId) {
+		String query = "select group_id as groupId, cmdty_id as commodityId, sell_interval as sellInterval, "
+				+ " buy_interval as buyInterval from group_commodity where group_id=? and cmdty_id=?";
+		Object[] params = new Object[] {groupId, commodityId};
+		try {
+			return getJdbcTemplate().query(query, params, new ResultSetExtractor<GroupCommodityVO>() {
+
+				@Override
+				public GroupCommodityVO extractData(ResultSet rs)
+						throws SQLException, DataAccessException {
+					GroupCommodityVO vo = null;
+					if (rs.next()) {
+						vo = new GroupCommodityVO();
+						vo.setGroupId(rs.getInt("groupId"));
+						vo.setCommodityId(rs.getInt("commodityId"));
+						vo.setSellInterval(rs.getFloat("sellInterval"));
+						vo.setBuyInterval(rs.getFloat("buyInterval"));
+					}
+					return vo;
+				}
+				
+			});
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 }

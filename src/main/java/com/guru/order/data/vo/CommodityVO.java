@@ -10,6 +10,7 @@ public class CommodityVO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private int id;
 	private String name;
+	private int commodityFamilyId;
 	private float mainInterval;
 	private float subInterval1;
 	private float subInterval2;
@@ -18,6 +19,11 @@ public class CommodityVO implements Serializable {
 
 	public CommodityVO() {
 		super();
+	}
+	
+	public CommodityVO(String name) {
+		super();
+		this.name = name;
 	}
 
 	public CommodityVO(int id, String name) {
@@ -40,6 +46,14 @@ public class CommodityVO implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public int getCommodityFamilyId() {
+		return commodityFamilyId;
+	}
+
+	public void setCommodityFamilyId(int commodityFamilyId) {
+		this.commodityFamilyId = commodityFamilyId;
 	}
 
 	public float getMainInterval() {

@@ -5,6 +5,7 @@ package com.guru.order.data.impl;
 
 import java.util.List;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Component;
 
@@ -27,8 +28,12 @@ public class UserDaoImpl extends BaseDao implements UserDao {
 	@Override
 	public List<UserDTO> getUsers() {
 		String query = "select id, first_name, email, mobile from candidates";
-		return (List<UserDTO>) getJdbcTemplate().query(query,
+		try {
+			return (List<UserDTO>) getJdbcTemplate().query(query,
 				new BeanPropertyRowMapper(UserDTO.class));
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	@Override

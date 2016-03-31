@@ -2,6 +2,7 @@ package com.guru.order.data.impl;
 
 import java.util.List;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Component;
 
@@ -14,14 +15,22 @@ public class TypesDaoImpl extends BaseDao implements TypesDao {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public TypeVO getTypeByName(String name) {
 		String query = "select id, name, description from types where name=?";
-		return ((TypeVO) getJdbcTemplate().query(query, new Object[] {name}, new BeanPropertyRowMapper(TypeVO.class)));
+		try {
+			return ((TypeVO) getJdbcTemplate().query(query, new Object[] {name}, new BeanPropertyRowMapper(TypeVO.class)));
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public List<TypeVO> getTypes() {
 		String query = "select id, name, description from types";
-		return ((List<TypeVO>) getJdbcTemplate().query(query, new BeanPropertyRowMapper(TypeVO.class)));
+		try {
+			return ((List<TypeVO>) getJdbcTemplate().query(query, new BeanPropertyRowMapper(TypeVO.class)));
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	@Override

@@ -9,11 +9,12 @@ public class WorkOrderVO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Long id;
-	private Long groupId;
+	private int groupId;
 	private String groupName;
 	private Long candidateId;
 	private int commodityId;
 	private String commodityName;
+	private int commodityFamilyId;
 	private Float previousSellPrice;
 	private Calendar previousSellDate;
 	private int previousSellQty;
@@ -34,11 +35,11 @@ public class WorkOrderVO implements Serializable {
 		this.id = id;
 	}
 
-	public Long getGroupId() {
+	public int getGroupId() {
 		return groupId;
 	}
 
-	public void setGroupId(Long groupId) {
+	public void setGroupId(int groupId) {
 		this.groupId = groupId;
 	}
 
@@ -72,6 +73,14 @@ public class WorkOrderVO implements Serializable {
 
 	public void setCommodityName(String commodityName) {
 		this.commodityName = commodityName;
+	}
+
+	public int getCommodityFamilyId() {
+		return commodityFamilyId;
+	}
+
+	public void setCommodityFamilyId(int commodityFamilyId) {
+		this.commodityFamilyId = commodityFamilyId;
 	}
 
 	public Float getPreviousSellPrice() {
@@ -164,7 +173,11 @@ public class WorkOrderVO implements Serializable {
 
 	@Override
 	public String toString() {
-		return String.format("Saving GrupName:%s, Commodity:%s, Candidate:%s, OrderType:%s, OrderQuantity:%s, orderAmount:%s, OrderTime:%s, ExpiryTime:%s",
-				getGroupName(), getCommodityName(), getCandidateId(), getOrderType(), getOrderQuantity(), getOrderAmount(), DateUtils.getSqlTimeStamp(getOrderTime()), DateUtils.getSqlTimeStamp(getExpiryDate()));
+		return String
+				.format("Saving GrupName:%s, Commodity:%s, Candidate:%s, OrderType:%s, OrderQuantity:%s, orderAmount:%s, OrderTime:%s, ExpiryTime:%s",
+						getGroupName(), getCommodityName(), getCandidateId(),
+						getOrderType(), getOrderQuantity(), getOrderAmount(),
+						DateUtils.getSqlTimeStamp(getOrderTime()),
+						DateUtils.getSqlTimeStamp(getExpiryDate()));
 	}
 }

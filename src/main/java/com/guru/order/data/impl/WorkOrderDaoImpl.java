@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -20,6 +21,7 @@ import com.guru.order.data.WorkOrderDao;
 import com.guru.order.data.vo.CommodityVO;
 import com.guru.order.data.vo.GroupVO;
 import com.guru.order.data.vo.RecentExecutionVO;
+import com.guru.order.data.vo.RecentTradedSubTypeVO;
 import com.guru.order.data.vo.WorkOrderVO;
 import com.guru.order.dto.OrderConfirmationDTO;
 import com.guru.order.utils.CollectionUtils;
@@ -33,7 +35,8 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 			+ " values ((select id from groups where name=?), (select id from commodity where name=?), ?, ?, ?, ?, ?, ?)";
 
 	public void movePreviousOrdersToBackup() {
-		String insertQuery = "insert into previous_work_order (select * from work_order)";
+		String insertQuery = "insert into previous_work_order (id, group_id, cmdty_id, prev_sell_price, prev_sell_date, prev_sell_qty, order_type, candidate_id, order_quantity, order_amount, order_time, expiry_date, executed_amount, executed_quantity, executed_time) "
+				+ " (select id, group_id, cmdty_id, prev_sell_price, prev_sell_date, prev_sell_qty, order_type, candidate_id, order_quantity, order_amount, order_time, expiry_date, executed_amount, executed_quantity, executed_time from work_order)";
 		String deleteQuery = "delete from work_order";
 		getJdbcTemplate().execute(insertQuery);
 		getJdbcTemplate().execute(deleteQuery);
@@ -90,7 +93,7 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 
 	@Override
 	public List<WorkOrderVO> getOrders(String orderType) {
-		String query = "select g.name as groupName, c.name as commodityName, c.id as commodityId, avg(wo.order_amount) orderAmount, "
+		String query = "select g.id as groupId, g.name as groupName, c.name as commodityName, c.id as commodityId, avg(wo.order_amount) orderAmount, "
 				+ " wo.id as workOrderId, wo.order_quantity as orderQuantity, wo.order_time as orderTime, wo.order_type as orderType, wo.expiry_date expiryDate "
 				+ " from groups g, commodity c, work_order wo where g.id=wo.group_id and c.id = wo.cmdty_id and wo.executed_amount is null "
 				+ " and wo.order_type = ? "
@@ -106,6 +109,7 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 					while (rs.next()) {
 						WorkOrderVO vo = new WorkOrderVO();
 						vo.setId(rs.getLong("workOrderId"));
+						vo.setGroupId(rs.getInt("groupId"));
 						vo.setGroupName(rs.getString("groupName"));
 						vo.setCommodityId(rs.getInt("commodityId"));
 						vo.setCommodityName(rs.getString("commodityName"));
@@ -128,7 +132,7 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 	
 	@Override
 	public List<WorkOrderVO> getNextOrders() {
-		String query = "select g.name as groupName, c.name as commodityName, c.id as commodityId, avg(wo.order_amount) orderAmount, "
+		String query = "select g.id as groupId, g.name as groupName, c.name as commodityName, c.id as commodityId, avg(wo.order_amount) orderAmount, "
 				+ " wo.order_quantity as orderQuantity, wo.order_time as orderTime, wo.order_type as orderType, wo.expiry_date expiryDate "
 				+ " from groups g, commodity c, next_work_order wo where g.id=wo.group_id and c.id = wo.cmdty_id "
 				+ " group by wo.group_id, wo.cmdty_id";
@@ -142,6 +146,7 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 					list = new ArrayList<WorkOrderVO>();
 					while (rs.next()) {
 						WorkOrderVO vo = new WorkOrderVO();
+						vo.setGroupId(rs.getInt("groupId"));
 						vo.setGroupName(rs.getString("groupName"));
 						vo.setCommodityId(rs.getInt("commodityId"));
 						vo.setCommodityName(rs.getString("commodityName"));
@@ -216,7 +221,11 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 	@Override
 	public List<GroupVO> getAdHocGroups() {
 		String query = "select g.id as id, g.name as name from groups g where g.id not in (select group_id from sub_type_groups)";
-		return getJdbcTemplate().query(query, new BeanPropertyRowMapper<GroupVO>(GroupVO.class));
+		try {
+			return getJdbcTemplate().query(query, new BeanPropertyRowMapper<GroupVO>(GroupVO.class));
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	@Override
@@ -226,7 +235,11 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 				+ " from recent_executions re, groups g, commodity c "
 				+ " where g.id=re.group_id and c.id=re.cmdty_id "
 				+ " order by sub_type_id asc, recent_exec_date desc";
-		return getJdbcTemplate().query(query, new BeanPropertyRowMapper<RecentExecutionVO>(RecentExecutionVO.class));
+		try {
+			return getJdbcTemplate().query(query, new BeanPropertyRowMapper<RecentExecutionVO>(RecentExecutionVO.class));
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 	
 	@Override
@@ -306,26 +319,18 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 	}
 
 	@Override
-	public void saveTradedOrders(final List<OrderConfirmationDTO> list, int groupId, String groupName) {
+	public void saveTradedOrders(final List<OrderConfirmationDTO> list) {
 		final Calendar executedTime = Calendar.getInstance();
 		String query = "update work_order set executed_amount=?, executed_quantity=?, executed_time=? "
 				+ " where candidate_id=? "
 				+ " and cmdty_id=(select id from commodity where name=?) "
 				+ " and DATE_FORMAT(expiry_Date, '%e-%m-%Y')=? "
-				+ " and order_type=?";
+				+ " and order_type=? and order_amount=?";
 		
 		for (OrderConfirmationDTO dto : list) {
-			String str = String.format("update work_order set executed_amount=%s, executed_quantity=%s, executed_time='%s' "
-					+ " where candidate_id=%s "
-					+ " and cmdty_id=(select id from commodity where name='%s') "
-					+ " and DATE_FORMAT(expiry_Date, )='%s' "
-					+ " and order_type='%s'", dto.getUnitPrice(), dto.getTradeQuantity(), DateUtils.getSqlTimeStamp(executedTime),
-					dto.getCandidateId(), dto.getCommodityName(), DateUtils.formatToDDMMYYYY(dto.getExpirtyDate().getTime()),
-					dto.getBuySellIndicator(), dto.getTradeQuantity(), dto.getUnitPrice());
-			System.out.println(str);
-			
 			Object[] params = new Object[] {dto.getUnitPrice(), dto.getTradeQuantity(), DateUtils.getSqlTimeStamp(executedTime), 
-					dto.getCandidateId(), dto.getCommodityName(), DateUtils.formatToDDMMYYYY(dto.getExpirtyDate()), dto.getBuySellIndicator().toUpperCase()};
+					dto.getCandidateId(), dto.getCommodityName(), DateUtils.formatToDDMMYYYY(dto.getExpirtyDate()), 
+					dto.getBuySellIndicator().toUpperCase(), dto.getOrderPrice()};
 			getJdbcTemplate().update(query, params);
 		}
 		
@@ -333,7 +338,7 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 
 	@Override
 	public List<WorkOrderVO> getTradedOrders(String orderType) {
-		String query = "select wo.group_id as groupId, g.name as groupName, wo.cmdty_id as commodityId, c.name as commodityName, "
+		String query = "select wo.group_id as groupId, g.name as groupName, wo.cmdty_id as commodityId, c.name as commodityName, c.cmdt_family_id as commodityFamilyId, "
 				+ " avg(wo.executed_amount) as tradedPrice, avg(executed_quantity) as tradeQuantity, avg(wo.executed_time) as executedTime "
 				+ " from work_order wo, groups g, commodity c where wo.group_id = g.id and wo.cmdty_id = c.id "
 				+ " and wo.executed_amount is not null and wo.order_type=? "
@@ -348,10 +353,11 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 					list = new ArrayList<WorkOrderVO>();
 					while (rs.next()) {
 						WorkOrderVO vo = new WorkOrderVO();
-						vo.setGroupId(rs.getLong("groupId"));
+						vo.setGroupId(rs.getInt("groupId"));
 						vo.setGroupName(rs.getString("groupName"));
 						vo.setCommodityId(rs.getInt("commodityId"));
 						vo.setCommodityName(rs.getString("commodityName"));
+						vo.setCommodityFamilyId(rs.getInt("commodityFamilyId"));
 						vo.setExecutedAmount(rs.getFloat("tradedPrice"));
 						vo.setExecutedQuantity(rs.getInt("tradeQuantity"));
 						Calendar executedTime = DateUtils.getCalendar(rs.getTimestamp("executedTime"));
@@ -398,6 +404,113 @@ public class WorkOrderDaoImpl extends BaseDao implements WorkOrderDao {
 						}
 					});
 		}
+	}
+
+	@Override
+	public List<Integer> getAllSubTypeIdsByGroupId(int groupId) {
+		String query = "select st.id from sub_types st, types t, sub_type_groups stg where t.id=st.type_id and st.id=stg.sub_type_id and stg.group_id=?";
+		Object[] params = new Object[] {groupId};
+		return getJdbcTemplate().queryForList(query, params, Integer.class);
+	}
+	
+	@Override
+	public List<Integer> getRecentTradedSubTypes(List<Integer> subTypeIdsList, int groupId, int commodityFamilyId) {
+		String query = "select sub_type_id from recent_traded_sub_types rtst where rtst.sub_type_id in (?) and rtst.group_id=? and rtst.cmdt_family_id=?"
+				+ " order by order by recent_exec_date";
+		Object[] params = new Object[] {subTypeIdsList, groupId, commodityFamilyId};
+		return getJdbcTemplate().queryForList(query, params, Integer.class);
+	}
+
+	@Override
+	public Map<Integer, Integer> getGroupCommodityIdsMap(int commodityFamilyId) {
+		String query = "select g.id as groupId, c.id as commodityId from groups g, commodity c, group_commodity gc where g.id=gc.group_id and c.id=gc.cmdty_id and c.cmdt_family_id=?";
+		Object[] params = new Object[] {commodityFamilyId};
+		return getJdbcTemplate().query(query, params, new ResultSetExtractor<Map<Integer, Integer>> () {
+
+			@Override
+			public Map<Integer, Integer> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+				while (rs.next()) {
+					map.put(rs.getInt("groupId"), rs.getInt("commodityId"));
+				}
+				return map;
+			}
+			
+		});
+	}
+
+	@Override
+	public void updateRecentTradedSubTypes(List<RecentTradedSubTypeVO> recentTradedSubTypes) {
+		if (CollectionUtils.isEmpty(recentTradedSubTypes)) {
+			return;
+		}
+		for (RecentTradedSubTypeVO itemVo : recentTradedSubTypes) {
+			if (itemVo.getSubTypeId() > 0) {
+				if (isRecentTradedSubTypeExists(itemVo)) {
+					updateRecentTradedSubType(itemVo);
+				} else {
+					saveRecentTradedSubType(itemVo);
+				}
+			}
+		}
+	}
+
+	private void saveRecentTradedSubType(RecentTradedSubTypeVO rtstVo) {
+		String query = "insert into recent_traded_sub_types (sub_type_id, group_id, cmdt_family_id, recent_exec_date) values ( "
+				+ " ?, ?, (select cmdt_family_id from commodity where name=?), ?)";
+		Object[] params = new Object[] {rtstVo.getSubTypeId(), rtstVo.getGroupId(), 
+				rtstVo.getCommodity().getName(), DateUtils.getSqlTimeStamp(rtstVo.getRecentExecDate())};
+		getJdbcTemplate().update(query, params);
+	}
+
+	private void updateRecentTradedSubType(RecentTradedSubTypeVO rtstVo) {
+		String query = "update recent_traded_sub_types set recent_exec_date=? where sub_type_id=? "
+				+ " and group_id=? "
+				+ " and cmdt_family_id=(select cmdt_family_id from commodity where name=?)";
+		Object[] params = new Object[] {DateUtils.getSqlTimeStamp(rtstVo.getRecentExecDate()), rtstVo.getSubTypeId(),
+				rtstVo.getGroupId(), rtstVo.getCommodity().getName()};
+		getJdbcTemplate().update(query, params);
+	}
+
+	private boolean isRecentTradedSubTypeExists(RecentTradedSubTypeVO rtstVO) {
+		String query = "select count(1) from recent_traded_sub_types rtst, commodity c where "
+				+ " rtst.sub_type_id=? and rtst.group_id=?"
+				+ " and rtst.cmdt_family_id=c.cmdt_family_id and c.name=?";
+		Object[] params = new Object[] {rtstVO.getSubTypeId(), rtstVO.getGroupId(), rtstVO.getCommodity().getName()};
+		int rowCount = getJdbcTemplate().queryForObject(query, params, Integer.class);
+		return (rowCount > 0);
+	}
+
+	@Override
+	public void saveMiscTradedItems(final List<OrderConfirmationDTO> tradedList, final Calendar tradedTime) {
+		if(CollectionUtils.isEmpty(tradedList)) {
+			return;
+		}
+		String query = "insert into work_order (cmdty_id, order_type, candidate_id, order_quantity, order_amount, order_time, expiry_date, "
+				+ " executed_amount, executed_quantity, executed_time) values ("
+				+ " (select id from commodity where name=?), ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+		getJdbcTemplate().batchUpdate(query,
+			new BatchPreparedStatementSetter() {
+
+				public void setValues(PreparedStatement ps, int i)
+						throws SQLException {
+					OrderConfirmationDTO vo = tradedList.get(i);
+					ps.setString(1, vo.getCommodityName());
+					ps.setString(2, vo.getBuySellIndicator());
+					ps.setLong(3, vo.getCandidateId());
+					ps.setInt(4, 0);
+					ps.setFloat(5, 0);
+					ps.setTimestamp(6, null);
+					ps.setTimestamp(7, DateUtils.getSqlTimeStamp(vo.getExpirtyDate()));
+					ps.setFloat(8, vo.getUnitPrice());
+					ps.setInt(9, vo.getTradeQuantity());
+					ps.setTimestamp(10, DateUtils.getSqlTimeStamp(tradedTime));
+				}
+
+				public int getBatchSize() {
+					return tradedList.size();
+				}
+			});
 	}
 
 }

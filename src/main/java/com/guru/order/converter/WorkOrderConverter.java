@@ -8,6 +8,7 @@ import com.guru.order.data.vo.WorkOrderVO;
 import com.guru.order.dto.GroupDTO;
 import com.guru.order.dto.OrderDTO;
 import com.guru.order.dto.OrderData;
+import com.guru.order.utils.DateUtils;
 
 public class WorkOrderConverter {
 
@@ -31,7 +32,7 @@ public class WorkOrderConverter {
 							vo.setOrderAmount(orderData.getOrderPrice());
 							vo.setOrderQuantity(orderData.getQuantity());
 							vo.setOrderTime(todayCal);
-							vo.setExpiryDate(orderData.getExpiryDateAsCal());
+							vo.setExpiryDate(DateUtils.getCalendarAsddMMMyy(orderData.getExpiryDate()));
 							list.add(vo);
 						}
 					}

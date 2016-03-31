@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.guru.order.data.vo.CommodityFamilyVO;
 import com.guru.order.data.vo.CommodityVO;
 
 public interface CommodityDao {
@@ -32,5 +33,9 @@ public interface CommodityDao {
 	Map<Integer, CommodityVO> getCommodityIntervals(Set<Integer> commodityIDsSet);
 
 	List<Date> getExpiryDates(int commodityId);
+
+	List<CommodityFamilyVO> getCommodityFamilies();
+
+	List<CommodityVO> getCommoditiesByFamily(Long familyId);
 
 }
