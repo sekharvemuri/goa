@@ -42,7 +42,7 @@ public class UserDaoImpl extends BaseDao implements UserDao {
 		getJdbcTemplate().update(
 				query,
 				new Object[] { userDTO.getId(), userDTO.getName(),
-						userDTO.getEmail(), userDTO.getMobileNumber() });
+						userDTO.getEmail(), userDTO.getMobile() });
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class UserDaoImpl extends BaseDao implements UserDao {
 		getJdbcTemplate().update(
 				query,
 				new Object[] { userDTO.getName(), userDTO.getEmail(),
-						userDTO.getMobileNumber(), userDTO.getId() });
+						userDTO.getMobile(), userDTO.getId() });
 	}
 
 	@Override
