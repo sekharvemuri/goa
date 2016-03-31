@@ -33,4 +33,9 @@ app.controller("HeaderController", ['$scope', '$location', function($scope, $loc
 		$(".cd-panel-close").click();
 		$location.path("users");
 	}
+	
+	$scope.showUploadTrades = function(){
+		$(".cd-panel-close").click();
+		$location.path("views/upload.html");
+	}
 }]);

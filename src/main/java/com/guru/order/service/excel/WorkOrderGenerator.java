@@ -23,40 +23,31 @@ public class WorkOrderGenerator extends BasePoiUtil {
 
 	public Map<String, List<String>> getGroupCandidates(InputStream inputStream) {
 		Map<String, List<String>> map = new HashMap<String, List<String>>();
-		map.put("Group A A", StringUtils.toList("69641"));
 		map.put("Group A", StringUtils.toList("90178"));
-		map.put("Group B", StringUtils.toList("90181"));
-		map.put("Group C", StringUtils.toList("90177"));
-		map.put("Group D", StringUtils.toList("90125,90138,8712"));
-		map.put("Group E",
-				StringUtils.toList("69757,90140,90142,	90127	,90141,90183"));
-		map.put("Group F", StringUtils
-				.toList("69756,90135,90120,90137,90139 , 90160 ,90166"));
-		map.put("Group G", StringUtils.toList("90104,90152,90154,90174"));
-		map.put("Group H", StringUtils.toList("90121"));
-		map.put("Group I", StringUtils.toList("90175,90173,90164"));
-		map.put("Group J", StringUtils.toList("90176"));
-		map.put("Group K",
-				StringUtils.toList("90149,90159,90180,90104,90152,90154,90174"));
-		map.put("Group L", StringUtils
-				.toList("90111, 90170,90124,90163,90175,90173,90164,90189"));
-		map.put("Group M", StringUtils.toList("90156,90130,90150,90188"));
-		map.put("Group N", StringUtils.toList("90146 ,90171"));
-		map.put("Group O",
-				StringUtils
-						.toList("69757,90140,90142,90127,90141,69756,90137,90135,90125,90138,90120,90139 ,8712,90183,90160"));
-		map.put("Group P",
-				StringUtils.toList("90133,90119,90148,90155 ,90179,90187"));
-		map.put("Group Q", StringUtils.toList("90131"));
-		map.put("Group R",
-				StringUtils
-						.toList("  90140,90142,90137,90139 ,90120,90125,69757,90135,90160,90183"));
-		map.put("Group S", StringUtils.toList("90162,90129"));
-		map.put("Group T", StringUtils.toList("90159"));
-		map.put("Group U", StringUtils.toList("90181"));
-		map.put("Group V", StringUtils.toList("90143"));
-		map.put("Group W", StringUtils.toList("90157,90147,90167"));
-		map.put("Group X", StringUtils.toList("90153,90144,90145"));
+		map.put("Group B", StringUtils.toList("90125, 90138,8712"));
+		map.put("Group C", StringUtils.toList("69757, 90140,90142,90127,90141,90183"));
+		map.put("Group D", StringUtils.toList("69756, 90135,90120,90137,90139,90160,90166"));
+		map.put("Group E", StringUtils.toList("90149, 90159,90180,90104,90152,90154,90174,90121,90162,90129,90143"));
+		map.put("Group F", StringUtils.toList("90111, 90170,90124,90163,90175,90173,90164,90189,90195,90190,90197"));
+		map.put("Group G", StringUtils.toList("90156, 90130,90150,90188,90196,90187"));
+		map.put("Group H", StringUtils.toList("90133, 90119,90148,90155,90179,90184,90186,90153,90144,90145,90157,90147,90167"));
+		map.put("Group I", StringUtils.toList("69757, 90140,90142,90127,90141,69756,90137,90135,90125,90138,90120,90139 ,8712,90183,90160"));
+		map.put("Group J", StringUtils.toList("0140, 90142,90137,90139 ,90120,90125,69757,90135,90160,90183"));
+		map.put("Group K", StringUtils.toList("90131"));
+		map.put("Group L", StringUtils.toList("90162, 90129"));
+		map.put("Group M", StringUtils.toList("90159"));
+		map.put("Group N", StringUtils.toList("90181"));
+		map.put("Group O", StringUtils.toList("90143"));
+		map.put("Group P", StringUtils.toList("90157, 90147,90167"));
+		map.put("Group Q", StringUtils.toList("90153, 90144,90145"));
+		map.put("Group R", StringUtils.toList("69641"));
+		map.put("Group S", StringUtils.toList("90181"));
+		map.put("Group T", StringUtils.toList("90177"));
+		map.put("Group U", StringUtils.toList("90104, 90152,90154,90174"));
+		map.put("Group V", StringUtils.toList("90121"));
+		map.put("Group W", StringUtils.toList("90175, 90173,90164"));
+		map.put("Group X", StringUtils.toList("90176"));
+		map.put("Group Y", StringUtils.toList("90146, 90171"));
 		return map;
 	}
 
@@ -72,7 +63,7 @@ public class WorkOrderGenerator extends BasePoiUtil {
 			int lastRowIndex = sheet.getLastRowNum();
 			String symbol = "";
 
-			for (int rowIndex = 0; rowIndex < lastRowIndex; rowIndex++) {
+			for (int rowIndex = 0; rowIndex <= lastRowIndex; rowIndex++) {
 				row = sheet.getRow(rowIndex);
 				if (row == null) {
 					continue;
@@ -146,7 +137,12 @@ public class WorkOrderGenerator extends BasePoiUtil {
 
 	private double getNumericCellValue(HSSFRow row, int colIndex) {
 		HSSFCell cell = row.getCell(colIndex);
+		try {
 		return (cell == null) ? 0.0d : cell.getNumericCellValue();
+		} catch (Exception e) {
+			System.out.println(cell.getStringCellValue());
+			throw new RuntimeException(e);
+		}
 	}
 
 	private String getCellStringValue(HSSFRow row, int colIndex) {

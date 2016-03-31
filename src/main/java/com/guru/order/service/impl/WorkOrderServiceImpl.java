@@ -32,6 +32,7 @@ public class WorkOrderServiceImpl {
 
 		for (WorkOrderVO vo : workOrdersList) {
 			groupsDao.saveCommodity(vo.getCommodityName());
+			groupsDao.saveCommodity(vo.getCommodityName(), vo.getExpiryDate());
 			groupsDao.saveGroupCommodity(vo.getGroupName(),
 					vo.getCommodityName());
 		}

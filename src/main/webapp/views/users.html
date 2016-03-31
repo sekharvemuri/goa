@@ -11,7 +11,7 @@
 			<td ng-bind="user.id"></td>
 			<td ng-bind="user.name"></td>
 			<td ng-bind="user.email"></td>
-			<td ng-bind="user.mobileNumber"></td>
+			<td ng-bind="user.mobile"></td>
 			<td>
 				<div class="pointer">
                     <span class="glyphicon glyphicon-menu-hamburger" ng-click="editUser($index)"></span>
@@ -68,7 +68,7 @@
                     <label for="mobile">Mobile:</label>
                 </div>
                 <div class="col-md-6">
-                    <input type="text" class="form-control" id="mobile" ng-model="user.mobileNumber"/>
+                    <input type="text" class="form-control" id="mobile" ng-model="user.mobile"/>
                 </div>
             </div>
         </div>

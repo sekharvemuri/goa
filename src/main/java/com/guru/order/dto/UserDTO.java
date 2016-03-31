@@ -16,7 +16,7 @@ public class UserDTO implements Serializable {
 	private Integer id;
 	private String name;
 	private String email;
-	private String mobileNumber;
+	private String mobile;
 
 	public Integer getId() {
 		return id;
@@ -42,12 +42,12 @@ public class UserDTO implements Serializable {
 		this.email = email;
 	}
 
-	public String getMobileNumber() {
-		return mobileNumber;
+	public String getMobile() {
+		return mobile;
 	}
 
-	public void setMobileNumber(String mobileNumber) {
-		this.mobileNumber = mobileNumber;
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
 	}
 
 }

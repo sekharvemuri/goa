@@ -84,21 +84,26 @@ public class DateUtils {
 		return sdf_dd_MMM_yyyy.format(cal.getTime());
 	}
 
-	public static Date getDateAsddMMMyy(String expiryDate) throws ParseException {
+	public static Date getDateAsddMMMyy(String expiryDate)
+			throws ParseException {
 		if (StringUtils.isNotBlank(expiryDate)) {
 			return sdf_dd_MMM_yy.parse(expiryDate);
 		}
 		return null;
 	}
 
-	public static Calendar getCalendarAsddMMMyy(String expiryDate) throws ParseException {
-		if (StringUtils.isNotBlank(expiryDate)) {
-			Date date = sdf_dd_MMM_yy.parse(expiryDate);
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(date);
-			return cal;
+	public static Calendar getCalendarAsddMMMyy(String expiryDate) {
+		Calendar cal = null;
+		try {
+			if (StringUtils.isNotBlank(expiryDate)) {
+				Date date = sdf_dd_MMM_yy.parse(expiryDate);
+				cal = Calendar.getInstance();
+				cal.setTime(date);
+				return cal;
+			}
+		} catch (ParseException e) {
 		}
-		return null;
+		return cal;
 	}
 
 	public static String formatToDDMMMYY(Date date) {

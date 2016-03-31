@@ -38,7 +38,16 @@ app.service("ComodityService", ['$http', function($http){
 			});
 		},
 		
-		getComodityFamilies: function(){
+		getComodityFamilies: function() {
+			return $http.get("rest/commodity/family/").then(function(response){
+				var comodityFamilies = response.data;
+				return comodityFamilies;
+			}, function(){
+				console.log("error::: ");
+			});
+		},
+		
+		getComodityFamiliesNew: function(){
 			return $http.get("scripts/services/UserService.js").then(function(response){
 				var comodityFamilies = [{
 					"comodityFamilyId": 1,

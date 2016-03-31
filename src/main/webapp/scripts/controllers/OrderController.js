@@ -54,13 +54,10 @@ app.controller("OrderController", ['$scope', '$location', 'OrderService', functi
 
 	$scope.submitOrder = function(){
 		$scope.order.groups = $scope.groups;
-		console.log("Posting date: ", $scope.order);
 		OrderService.placeOrder($scope.order).then(function(data){
-			console.log("order placed");
-			$location.path("/");
+			$location.path("/place");
 		}, function(error){
-			console.log("placing order failed");
-			$location.path("/");
+			alert('Failed to place order : ' + error);
 		});
 	}
 }]);

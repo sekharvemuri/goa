@@ -1,11 +1,6 @@
 package com.guru.order.dto;
 
 import java.io.Serializable;
-import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Date;
-
-import com.guru.order.utils.DateUtils;
 
 public class OrderData implements Serializable {
 
@@ -90,22 +85,6 @@ public class OrderData implements Serializable {
 
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
-	}
-
-	public Date getExpiryDateAsDate() {
-		try {
-			return DateUtils.getDateAsddMMMyy(expiryDate);
-		} catch (ParseException e) {
-			return null;
-		}
-	}
-
-	public Calendar getExpiryDateAsCal() {
-		try {
-			return DateUtils.getCalendarAsddMMMyy(expiryDate);
-		} catch (ParseException e) {
-			return null;
-		}
 	}
 
 }

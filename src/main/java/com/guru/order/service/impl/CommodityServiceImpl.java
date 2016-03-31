@@ -1,5 +1,6 @@
 package com.guru.order.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,16 +10,23 @@ import org.springframework.stereotype.Component;
 
 import com.guru.order.converter.CommodityConverter;
 import com.guru.order.data.CommodityDao;
+import com.guru.order.data.vo.CommodityFamilyVO;
 import com.guru.order.data.vo.CommodityVO;
 import com.guru.order.dto.CommodityDTO;
+import com.guru.order.dto.CommodityFamilyDTO;
 import com.guru.order.service.CommodityService;
 
 @Component
 public class CommodityServiceImpl implements CommodityService {
 
 	private CommodityDao commodityDao;
-
+	
 	public List<CommodityDTO> getCommodities() {
+		List<CommodityVO> commodityVOs = commodityDao.getCommodities();
+		return CommodityConverter.getCommodities(commodityVOs);
+	}
+
+	public List<CommodityDTO> getCommoditiesWithExpiryDates() {
 		List<CommodityVO> commodityVOs = null;
 		commodityVOs = commodityDao.getCommodities();
 		for (CommodityVO listItem : commodityVOs) {
@@ -64,5 +72,18 @@ public class CommodityServiceImpl implements CommodityService {
 	@Autowired
 	public void setCommodityDao(CommodityDao commodityDao) {
 		this.commodityDao = commodityDao;
+	}
+
+	@Override
+	public List<CommodityFamilyDTO> getCommodityFamilies() {
+		List<CommodityFamilyVO> list = commodityDao.getCommodityFamilies();
+		List<CommodityFamilyDTO> dtosList = new ArrayList<CommodityFamilyDTO>(list.size());
+		for (CommodityFamilyVO familyVO : list) {
+			CommodityFamilyDTO dto = CommodityConverter.getCommodityFamilyDTO(familyVO);
+			List<CommodityVO> commoditiesVOs = commodityDao.getCommoditiesByFamily(familyVO.getId());
+			dto.setCommodites(CommodityConverter.getCommodities(commoditiesVOs));
+			dtosList.add(dto);
+		}
+		return dtosList;
 	}
 }

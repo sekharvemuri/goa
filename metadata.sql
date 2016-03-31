@@ -25,41 +25,53 @@ insert into SUB_TYPES (TYPE_ID, NAME) values ((select ID from TYPES where NAME='
 insert into SUB_TYPES (TYPE_ID, NAME) values ((select ID from TYPES where NAME='Type B'), 'Sub Type B.2');
 insert into SUB_TYPES (TYPE_ID, NAME) values ((select ID from TYPES where NAME='Type B'), 'Sub Type B.3');
 
+create table commodity_family (
+	ID int primary key auto_increment,
+	name varchar(10) unique
+);
+
+insert into commodity_family (name) values ('ALLUMINIUM');
+insert into commodity_family (name) values ('COPPER');
+insert into commodity_family (name) values ('LEAD');
+insert into commodity_family (name) values ('NICKEL');
+insert into commodity_family (name) values ('SILVER');
+insert into commodity_family (name) values ('ZINC');
+
 create table commodity (
 	ID int primary key auto_increment,
 	NAME varchar(10) unique,
+	cmdt_family_id int references commodity_family(id),
 	main_interval decimal(6,2), 
 	sub_interval_1 decimal(6,2),
 	sub_interval_2 decimal(6,2),
 	sub_interval_3 decimal(6,2)
 );
 
+insert into commodity (NAME, cmdt_family_id) values ('ALUMINI', (select id from commodity_family where name='ALLUMINIUM'));
+insert into commodity (NAME, cmdt_family_id) values ('ALUMINIUM', (select id from commodity_family where name='ALLUMINIUM'));
+insert into commodity (NAME, cmdt_family_id) values ('COPPER', (select id from commodity_family where name='COPPER'));
+insert into commodity (NAME, cmdt_family_id) values ('COPPERM', (select id from commodity_family where name='COPPER'));
+insert into commodity (NAME, cmdt_family_id) values ('LEAD', (select id from commodity_family where name='LEAD'));
+insert into commodity (NAME, cmdt_family_id) values ('LEADMINI', (select id from commodity_family where name='LEAD'));
+insert into commodity (NAME, cmdt_family_id) values ('NICKEL', (select id from commodity_family where name='NICKEL'));
+insert into commodity (NAME, cmdt_family_id) values ('NICKELM', (select id from commodity_family where name='NICKEL'));
+insert into commodity (NAME, cmdt_family_id) values ('SILVERM', (select id from commodity_family where name='SILVER'));
+insert into commodity (NAME, cmdt_family_id) values ('SILVERMIC', (select id from commodity_family where name='SILVER'));
+insert into commodity (NAME, cmdt_family_id) values ('ZINC', (select id from commodity_family where name='ZINC'));
+insert into commodity (NAME, cmdt_family_id) values ('ZINCMINI', (select id from commodity_family where name='ZINC'));
+
 create table commodity_expiry_date (
-	name varchar(10),
+	cmdt_id int references commodity.ID,
 	expiry_date date,
-	primary key (name, expiry_date)
+	primary key (cmdt_id, expiry_date)
 );
 
-insert into commodity (NAME) values ('ALLUMINIUM');
-insert into commodity (NAME) values ('ALUMINI');
-insert into commodity (NAME) values ('COPPER');
-insert into commodity (NAME) values ('COPPERM');
-insert into commodity (NAME) values ('LEAD');
-insert into commodity (NAME) values ('LEADMINI');
-insert into commodity (NAME) values ('NICKEL');
-insert into commodity (NAME) values ('NICKELM');
-insert into commodity (NAME) values ('SILVER');
-insert into commodity (NAME) values ('SILVERM');
-insert into commodity (NAME) values ('SILVERMIC');
-insert into commodity (NAME) values ('ZINC');
-insert into commodity (NAME) values ('ZINCMINI');
-
-insert into commodity_expiry_date (NAME, expiry_date) values ('ALLUMINIUM', STR_TO_DATE('2016-03-29', '%Y-%m-%d'));
-insert into commodity_expiry_date (NAME, expiry_date) values ('ALLUMINIUM', STR_TO_DATE('2016-03-30', '%Y-%m-%d'));
-insert into commodity_expiry_date (NAME, expiry_date) values ('ALLUMINIUM', STR_TO_DATE('2016-03-31', '%Y-%m-%d'));
-insert into commodity_expiry_date (NAME, expiry_date) values ('COPPER', STR_TO_DATE('2016-04-28', '%Y-%m-%d'));
-insert into commodity_expiry_date (NAME, expiry_date) values ('COPPER', STR_TO_DATE('2016-04-29', '%Y-%m-%d'));
-insert into commodity_expiry_date (NAME, expiry_date) values ('COPPER', STR_TO_DATE('2016-04-30', '%Y-%m-%d'));
+insert into commodity_expiry_date (cmdt_id, expiry_date) values ((select id from commodity where name=('ALUMINI')), STR_TO_DATE('2016-03-29', '%Y-%m-%d'));
+insert into commodity_expiry_date (cmdt_id, expiry_date) values ((select id from commodity where name=('ALUMINIUM')), STR_TO_DATE('2016-03-30', '%Y-%m-%d'));
+insert into commodity_expiry_date (cmdt_id, expiry_date) values ((select id from commodity where name=('ALUMINIUM')), STR_TO_DATE('2016-03-31', '%Y-%m-%d'));
+insert into commodity_expiry_date (cmdt_id, expiry_date) values ((select id from commodity where name=('COPPER')), STR_TO_DATE('2016-04-28', '%Y-%m-%d'));
+insert into commodity_expiry_date (cmdt_id, expiry_date) values ((select id from commodity where name=('COPPER')), STR_TO_DATE('2016-04-29', '%Y-%m-%d'));
+insert into commodity_expiry_date (cmdt_id, expiry_date) values ((select id from commodity where name=('COPPER')), STR_TO_DATE('2016-04-30', '%Y-%m-%d'));
 
 create table groups (
 	id int primary key auto_increment,
@@ -103,8 +115,8 @@ insert into sub_type_groups (sub_type_id, group_id) values ((select sctg.id from
 create table group_commodity (
 	group_id int,
 	cmdty_id int,
-	sell_interval decimal(6,2),
-	buy_interval decimal(6,2),
+	sell_interval decimal(6,2) default 0,
+	buy_interval decimal(6,2) default 0,
 	primary key (group_id, cmdty_id)
 );
 
@@ -173,11 +185,10 @@ create table previous_work_order (
 	executed_time timestamp null
 );
 
-create table recent_executions (
+create table recent_traded_sub_types (
 	sub_type_id int, 
 	group_id int, 
-	cmdty_id int, 
-	interval_amt decimal(5,2), 
+	cmdt_family_id int, 
 	recent_exec_date timestamp default 0
 );
 

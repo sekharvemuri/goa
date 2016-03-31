@@ -3,11 +3,20 @@
 		<tr>
 			<th>Id</th>
 			<th>Name</th>
+			<th>Main Interval</th>
+			<th>Sub Interval1</th>
+			<th>Sub Interval2</th>
+			<th>Sub Interval3</th>
+			<th>Expiry date</th>
 			<th>Action</th>
 		</tr>
 		<tr ng-repeat="comodity in comodities">
 			<td ng-bind="comodity.id"></td>
 			<td ng-bind="comodity.name"></td>
+			<td ng-bind="comodity.mainInterval1"></td>
+			<td ng-bind="comodity.subInterval1"></td>
+			<td ng-bind="comodity.subInterval2"></td>
+			<td ng-bind="comodity.subInterval3"></td>
 			<td>
 				<div class="pointer">
                     <span class="glyphicon glyphicon-menu-hamburger" ng-click="editComodity($index)"></span>

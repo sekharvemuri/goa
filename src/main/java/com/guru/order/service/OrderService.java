@@ -7,7 +7,11 @@ import com.guru.order.dto.OrderDTO;
 public interface OrderService {
 
 	OrderDTO getNewOrder();
+
 	void saveOrder(OrderDTO order);
-	void saveOrderConfirmation(Reader reader)  throws Exception;
+
+	void saveTradedOrders(Reader reader) throws Exception;
+
 	void createNextOrders();
+
 }

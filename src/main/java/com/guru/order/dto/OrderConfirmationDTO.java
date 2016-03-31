@@ -21,6 +21,7 @@ public class OrderConfirmationDTO implements Serializable {
 	private Float tradeValue;
 	private Calendar executedTime;
 	private Calendar expirtyDate;
+	private float orderPrice;
 
 	public int getCompareId() {
 		return compareId;
@@ -108,6 +109,14 @@ public class OrderConfirmationDTO implements Serializable {
 
 	public void setExpirtyDate(Calendar expirtyDate) {
 		this.expirtyDate = expirtyDate;
+	}
+
+	public float getOrderPrice() {
+		return orderPrice;
+	}
+
+	public void setOrderPrice(float orderPrice) {
+		this.orderPrice = orderPrice;
 	}
 
 	@Override

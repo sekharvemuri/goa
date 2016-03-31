@@ -10,7 +10,6 @@ public class GroupDTO implements Serializable {
 	private int groupId;
 	private String groupName;
 	private String users;
-//	private List<String> usersList;
 	private List<CommodityDTO> commodities;
 	private List<OrderData> orderData = new ArrayList<OrderData>();
 
@@ -47,21 +46,6 @@ public class GroupDTO implements Serializable {
 	public void setUsers(String users) {
 		this.users = users;
 	}
-
-//	public List<String> getUsersList() {
-//		return usersList;
-//	}
-//
-//	public void setUsersList(List<String> usersList) {
-//		this.usersList = usersList;
-//	}
-//	
-//	public void addUser(String user) {
-//		if (usersList == null) {
-//			usersList = new ArrayList<String>();
-//		}
-//		usersList.add(user);
-//	}
 
 	public List<CommodityDTO> getCommodities() {
 		return commodities;

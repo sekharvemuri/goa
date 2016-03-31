@@ -23,7 +23,9 @@ import com.guru.order.converter.WorkOrderConverter;
 import com.guru.order.data.GroupsDao;
 import com.guru.order.data.WorkOrderDao;
 import com.guru.order.data.vo.CommodityVO;
+import com.guru.order.data.vo.GroupCommodityVO;
 import com.guru.order.data.vo.GroupVO;
+import com.guru.order.data.vo.RecentTradedSubTypeVO;
 import com.guru.order.data.vo.SubTypeVO;
 import com.guru.order.data.vo.WorkOrderVO;
 import com.guru.order.dto.CommodityDTO;
@@ -68,7 +70,7 @@ public class OrderServiceImpl implements OrderService {
 		List<GroupDTO> groupDTOsList = new ArrayList<GroupDTO>();
 		List<GroupVO> groupsList = groupsDao.getGroupsWithCandidates();
 		for (GroupVO groupVo : groupsList) {
-			getGroupDtoByGroupName(groupVo.getName(), groupDTOsList);
+			getGroupDtoByGroupName(groupVo.getId(), groupVo.getName(), groupDTOsList);
 		}
 
 		List<WorkOrderVO> sellOrders = getSellOrders();
@@ -82,7 +84,7 @@ public class OrderServiceImpl implements OrderService {
 		sortOrderData(groupDTOsList);
 
 		OrderDTO orderDTO = new OrderDTO();
-		orderDTO.setCommodities(this.commodityService.getCommodities());
+		orderDTO.setCommodities(this.commodityService.getCommoditiesWithExpiryDates());
 		orderDTO.setGroups(groupDTOsList);
 		return orderDTO;
 	}
@@ -155,7 +157,7 @@ public class OrderServiceImpl implements OrderService {
 			List<GroupDTO> dtosList) {
 		if (CollectionUtils.isNotEmpty(sellOrders)) {
 			for (WorkOrderVO workOrderVO : sellOrders) {
-				GroupDTO dto = getGroupDtoByGroupName(
+				GroupDTO dto = getGroupDtoByGroupName(workOrderVO.getGroupId(),
 						workOrderVO.getGroupName(), dtosList);
 				OrderData orderData = buildOrderData(workOrderVO);
 				dto.addOrderData(orderData);
@@ -178,7 +180,7 @@ public class OrderServiceImpl implements OrderService {
 		return orderData;
 	}
 
-	private GroupDTO getGroupDtoByGroupName(String groupName,
+	private GroupDTO getGroupDtoByGroupName(int groupId, String groupName,
 			List<GroupDTO> dtosList) {
 		GroupDTO groupDTO = null;
 		if (CollectionUtils.isNotEmpty(dtosList)) {
@@ -190,8 +192,7 @@ public class OrderServiceImpl implements OrderService {
 			}
 		}
 		if (groupDTO == null) {
-			groupDTO = new GroupDTO();
-			groupDTO.setGroupName(groupName);
+			groupDTO = new GroupDTO(groupId, groupName);
 			dtosList.add(groupDTO);
 		}
 		return groupDTO;
@@ -237,123 +238,160 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public void saveOrderConfirmation(Reader reader) throws Exception {
+	public void saveTradedOrders(Reader reader) throws Exception {
 		// convert the Reader to List of OrderConfirmationDTO
 		List<OrderConfirmationDTO> tradesList = csvUtils
 				.getExecutionsList(reader);
+		
+		List<OrderConfirmationDTO> buyTradedList = filterTradedListByOrderType(tradesList, "BUY");
+		List<OrderConfirmationDTO> sellTradedList = filterTradedListByOrderType(tradesList, "SELL");
 
 		// get the NewOrder from DB
 		OrderDTO orderDto = getNewOrder();
+		
+		// initialize recentTradedSubTypes;
+		List<RecentTradedSubTypeVO> recentTradedSubTypes = new ArrayList<RecentTradedSubTypeVO>();
+		Calendar tradedTime = Calendar.getInstance();
 
 		// for each Group in NewOrder iterate through each symbol & order type
 		// check for each candidate exists in the confirmation list or not ?
 		List<GroupDTO> groupDtosList = orderDto.getGroups();
 		for (GroupDTO groupDto : groupDtosList) {
-			// get users list from group
-			String usersStr = groupDto.getUsers();
-			String[] users = usersStr.split(",");
-
 			// get all orders based
-			List<OrderData> ordersList = groupDto.getOrderData();
-			for (OrderData orderData : ordersList) {
-				String commodityName = orderData.getCommodity().getName();
-				String orderType = orderData.getOrderType();
-				Map<String, List<OrderConfirmationDTO>> confirmOrdersMap = getTradedCandidates(
-						tradesList, usersStr, commodityName, orderType,
-						orderData.getExpiryDateAsCal());
-				if (confirmOrdersMap.size() > 0) {
-					Set<String> keySet = confirmOrdersMap.keySet();
-					if (confirmOrdersMap.size() == 1) {
-						String key = keySet.iterator().next();
-						List<OrderConfirmationDTO> confirmOrdersList = confirmOrdersMap
-								.get(key);
-						if (users.length == confirmOrdersList.size()) {
-							workOrderDao.saveTradedOrders(confirmOrdersList,
-									groupDto.getGroupId(),
-									groupDto.getGroupName());
-							tradesList.removeAll(confirmOrdersList);
-						}
-					} else {
-						// not happy path
-						// example: multiple BUYs per group, symbol & expiry
-						// date
-					}
-				}
+			if (CollectionUtils.isNotEmpty(buyTradedList)) {
+				List<OrderData> buyOrdersList = filterByOrderType(groupDto.getOrderData(), "BUY");
+				processTradedOrders(buyTradedList, recentTradedSubTypes, tradedTime,
+						groupDto, buyOrdersList);	
 			}
+			
+			if (CollectionUtils.isNotEmpty(sellTradedList)) {
+				List<OrderData> sellOrdersList = filterByOrderType(groupDto.getOrderData(), "SELL");
+				processTradedOrders(sellTradedList, recentTradedSubTypes, tradedTime,
+						groupDto, sellOrdersList);	
+			}
+		}
+		
+		processMiscTradedItems(buyTradedList, tradedTime);
+		processMiscTradedItems(sellTradedList, tradedTime);
+		
+		updateRecentTradedSubTypes(recentTradedSubTypes);
+	}
 
+	private void processMiscTradedItems(List<OrderConfirmationDTO> tradedList, Calendar tradedTime) {
+		if (CollectionUtils.isEmpty(tradedList)) {
+			return;
+		}
+		workOrderDao.saveMiscTradedItems(tradedList, tradedTime);
+	}
+
+	private void processTradedOrders(List<OrderConfirmationDTO> tradesList,
+			List<RecentTradedSubTypeVO> recentTradedSubTypes,
+			Calendar tradedTime, GroupDTO groupDto, List<OrderData> ordersList) {
+		if (CollectionUtils.isEmpty(tradesList) || CollectionUtils.isEmpty(ordersList)) {
+			return;
+		}
+		// get users list from group
+		String usersStr = groupDto.getUsers();
+		String[] users = usersStr.split(",");
+		
+		for (OrderData orderData : ordersList) {
+			String commodityName = orderData.getCommodity().getName();
+			Map<String, List<OrderConfirmationDTO>> confirmOrdersMap = getTradedCandidates(
+					tradesList, usersStr, commodityName, orderData);
+			if (confirmOrdersMap.size() > 0) {
+				Set<String> keySet = confirmOrdersMap.keySet();
+				if (confirmOrdersMap.size() == 1) {
+					String key = keySet.iterator().next();
+					List<OrderConfirmationDTO> confirmOrdersList = confirmOrdersMap
+							.get(key);
+					if (users.length == confirmOrdersList.size()) {
+						workOrderDao.saveTradedOrders(confirmOrdersList);
+						tradesList.removeAll(confirmOrdersList);
+					}
+				} else {
+					// not happy path
+					// example: multiple BUYs per group, symbol & expiry
+					// date
+				}
+				
+				SubTypeVO subTypeVO = groupsDao.getSubType(groupDto.getGroupId());
+				RecentTradedSubTypeVO recentTradedSubType = new RecentTradedSubTypeVO();
+				if (subTypeVO != null) {
+					recentTradedSubType.setSubTypeId(subTypeVO.getId());
+				}
+				recentTradedSubType.setGroupId(groupDto.getGroupId());
+				recentTradedSubType.setCommodity(new CommodityVO(commodityName));
+				recentTradedSubType.setRecentExecDate(tradedTime);
+				recentTradedSubTypes.add(recentTradedSubType);
+			}
 		}
 	}
 
-	// @Override
-	// public void saveOrderConfirmation(Reader reader) throws Exception {
-	// List<OrderConfirmationDTO> list = csvUtils.getExecutionsList(reader);
-	// Map<String, Map<Long, List<OrderConfirmationDTO>>> map =
-	// parseInToOrderTypeAndCandidate(list);
-	// OrderDTO orderDto = getNewOrder();
-	//
-	// //Process SELL orders first
-	// Map<Long, List<OrderConfirmationDTO>> sellOrdersMap = map.get("SELL");
-	// for (Long candidateId : sellOrdersMap.keySet()) {
-	// List<OrderConfirmationDTO> ordersList = sellOrdersMap.get(candidateId);
-	// ordersList = sortOrdersByPrice(ordersList, "asc");
-	//
-	// for (OrderConfirmationDTO dto : ordersList) {
-	// List<String> groupNamesLst = getGroupsContainsOrder(orderDto.getGroups(),
-	// dto);
-	//
-	// // get each group and check for other users also have the same confirm
-	// order or not.
-	// // get the sub list from OrderDTO (new order).
-	// // because in first group there is a chance of existing single user that
-	// contain similar order
-	//
-	// }
-	// }
-	//
-	// //Map<Long, Map<String, List<OrderConfirmationDTO>>> map =
-	// parseInToCandidateAndOrderType(list);
-	//
-	// /*
-	// * (120, Lead Mini, SELL, 60156, Group A)
-	// * (120, Lead Mini, SELL, 60156, Group B)
-	// *
-	// * symbol wise, candidates,
-	// *
-	// Map<candidateID, Map<orderType, List<VO>>>
-	//
-	// each candidate can have multiple SELL, BUY orders.
-	//
-	// SELL orders - 1st lowest order will get executes.
-	// for (SELL orders) {
-	// get each vo (100, Lead Mini, SELL, 60156, Group A)
-	// get list of records with candidateId, orderType, commodity from DB where
-	// executed price is NULL, in order price ascending order //for SELL
-	// get 1st db record (100, Lead Mini, SELL, 60156, 101, )
-	// update DB
-	//
-	// }
-	//
-	//
-	// Question : if both groups have same order price and only if one of the
-	// order executed
-	// Solution :
-	//
-	// * */
-	//
-	// workOrderDao.saveOrderConfirmation(map);
-	// }
+	private List<OrderData> filterByOrderType(List<OrderData> ordersList,
+			final String orderType) {
+		List<OrderData> subList = new ArrayList<OrderData>();
+		for (OrderData orderData : ordersList) {
+			if (orderType.equalsIgnoreCase(orderData.getOrderType())) {
+				subList.add(orderData);
+			}
+		}
+		Collections.sort(subList, new Comparator<OrderData>() {
+
+			@Override
+			public int compare(OrderData o1, OrderData o2) {
+				int value = 0;
+				if ("BUY".equalsIgnoreCase(orderType)) {
+					value = new Float(o2.getOrderPrice() - o1.getOrderPrice()).intValue();
+				} else {
+					value = new Float(o2.getOrderPrice() - o2.getOrderPrice()).intValue();
+				}
+				return value;
+			}
+		});
+		return subList;
+	}
+	
+	private List<OrderConfirmationDTO> filterTradedListByOrderType(
+			List<OrderConfirmationDTO> tradesList, final String orderType) {
+		List<OrderConfirmationDTO> subList = new ArrayList<OrderConfirmationDTO>();
+		for (OrderConfirmationDTO dto : tradesList) {
+			if (orderType.equalsIgnoreCase(dto.getBuySellIndicator())) {
+				subList.add(dto);
+			}
+		}
+		Collections.sort(subList, new Comparator<OrderConfirmationDTO>() {
+
+			@Override
+			public int compare(OrderConfirmationDTO o1, OrderConfirmationDTO o2) {
+				int value = 0;
+				if ("BUY".equalsIgnoreCase(orderType)) {
+					value = new Float(o2.getUnitPrice() - o1.getUnitPrice()).intValue();
+				} else {
+					value = new Float(o2.getUnitPrice() - o2.getUnitPrice()).intValue();
+				}
+				return value;
+			}
+		});
+		return subList;
+	}
+
+	private void updateRecentTradedSubTypes(List<RecentTradedSubTypeVO> recentTradedSubTypes) {
+		// this should be done only for BUY trades.
+		workOrderDao.updateRecentTradedSubTypes(recentTradedSubTypes);
+	}
 
 	private Map<String, List<OrderConfirmationDTO>> getTradedCandidates(
 			List<OrderConfirmationDTO> tradesList, String users,
-			String commodityName, String orderType, Calendar expiryDate) {
+			String commodityName, OrderData orderData) {
 		Map<String, List<OrderConfirmationDTO>> map = new HashMap<String, List<OrderConfirmationDTO>>();
 		List<OrderConfirmationDTO> list = null;
+		Calendar expiryDate = DateUtils.getCalendarAsddMMMyy(orderData.getExpiryDate());
 		String orderExpiryDateStr = DateUtils.formatToDDMMYYYY(expiryDate);
 		for (OrderConfirmationDTO dto : tradesList) {
 			String tradedCandId = String.valueOf(dto.getCandidateId());
 			if (users.contains(tradedCandId)
 					&& commodityName.equalsIgnoreCase(dto.getCommodityName())
-					&& orderType.equalsIgnoreCase(dto.getBuySellIndicator())) {
+					&& orderData.getOrderType().equalsIgnoreCase(dto.getBuySellIndicator())) {
 				String tradeExpiryDateStr = DateUtils.formatToDDMMYYYY(dto
 						.getExpirtyDate());
 				if (orderExpiryDateStr.equalsIgnoreCase(tradeExpiryDateStr)) {
@@ -364,6 +402,7 @@ public class OrderServiceImpl implements OrderService {
 						list = new ArrayList<OrderConfirmationDTO>();
 						map.put(key, list);
 					}
+					dto.setOrderPrice(orderData.getOrderPrice());
 					list.add(dto);
 				}
 			}
@@ -373,14 +412,15 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public void createNextOrders() {
-		List<WorkOrderVO> nextSellOrders = processNextBuyOrdersForTradedSellOrders();
-		if (CollectionUtils.isNotEmpty(nextSellOrders)) {
-			workOrderDao.saveNextWorkOrders(nextSellOrders);
+		List<WorkOrderVO> nextOrdersList = new ArrayList<WorkOrderVO>();
+		processNextBuyOrdersForSellTrades(nextOrdersList);
+		processNextSellOrdersForBuyTrades(nextOrdersList);
+		if (CollectionUtils.isNotEmpty(nextOrdersList)) {
+			workOrderDao.saveNextWorkOrders(nextOrdersList);
 		}
-		
 	}
 
-	private List<WorkOrderVO> processNextBuyOrdersForTradedSellOrders() {
+	private List<WorkOrderVO> processNextBuyOrdersForSellTrades(List<WorkOrderVO> nextOrdersList) {
 		List<WorkOrderVO> tradedList = workOrderDao.getTradedOrders("SELL");
 		if (CollectionUtils.isEmpty(tradedList)) {
 			return null;
@@ -392,23 +432,29 @@ public class OrderServiceImpl implements OrderService {
 		//Set<Long> groupIds = getGroupIDsFromWorkOrders(tradedList);
 		Map<String, List<String>> groupCandidatesMap = workOrderDao.getGroupUsers();
 		
-		List<WorkOrderVO> nextOrdersList = new ArrayList<WorkOrderVO>();
 		for (WorkOrderVO tradedVo : tradedList) {
-			Long groupId = tradedVo.getGroupId();
+			int groupId = tradedVo.getGroupId();
 			if (validateIsGroupInSubType(groupId)) {
-				generateNextBuyOrders(tradedVo, groupCandidatesMap.get(tradedVo.getGroupName()), 
-						commodityIntervalsMap.get(tradedVo.getCommodityId()), nextOrdersList);
+				CommodityVO commodityVO = commodityIntervalsMap.get(tradedVo.getCommodityId());
+				generateNextOrders(tradedVo, groupCandidatesMap.get(tradedVo.getGroupName()), 
+						commodityVO.getSubInterval1(), "BUY", nextOrdersList);
 			} else {
-				//TODO: for group-commodity-intervals
+				// get Group-Commodity BUY interval
+				GroupCommodityVO groupCommodityVO = groupsDao.getGroupCommodityDetails(groupId, tradedVo.getCommodityId());
+				if (groupCommodityVO != null) {
+					generateNextOrders(tradedVo, groupCandidatesMap.get(tradedVo.getGroupName()), 
+							groupCommodityVO.getBuyInterval(), "BUY", nextOrdersList);
+				}
 			}
 		}
 		return nextOrdersList;
 	}
-	
-	
 
-	private void generateNextBuyOrders(WorkOrderVO tradedVo, List<String> candidatesList,
-			CommodityVO commodityVO, List<WorkOrderVO> nextOrdersList) {
+	private void generateNextOrders(WorkOrderVO tradedVo, List<String> candidatesList,
+			float interval, String orderType, List<WorkOrderVO> nextOrdersList) {
+		if (interval <= 0.0) {
+			return;
+		}
 		for(String candidateId : candidatesList) {
 			WorkOrderVO nextOrder = new WorkOrderVO();
 			nextOrder.setGroupId(tradedVo.getGroupId());
@@ -417,15 +463,24 @@ public class OrderServiceImpl implements OrderService {
 			nextOrder.setPreviousSellDate(tradedVo.getExecutedTime());
 			nextOrder.setPreviousSellPrice(tradedVo.getExecutedAmount());
 			nextOrder.setPreviousSellQty(tradedVo.getExecutedQuantity());
-			nextOrder.setOrderType("BUY");
+			nextOrder.setOrderType(orderType);
 			nextOrder.setOrderQuantity(tradedVo.getExecutedQuantity());
-			nextOrder.setOrderAmount(tradedVo.getExecutedAmount() - commodityVO.getSubInterval1());
-			//TODO: need to set the expiry date
+			float newOrderValue = 0;
+			if ("BUY".equalsIgnoreCase(orderType)) {
+				newOrderValue = tradedVo.getExecutedAmount() - interval;
+			} else if ("SELL".equalsIgnoreCase(orderType)) {
+				newOrderValue = tradedVo.getExecutedAmount() + interval;
+			}
+			//TODO: upto .2 decimals only 
+			// 1st decimal should be nearing to 5
+			// 2nd decimal should be rounded to 0. 
+			nextOrder.setOrderAmount(newOrderValue);
+			nextOrder.setExpiryDate(tradedVo.getExpiryDate());
 			nextOrdersList.add(nextOrder);
 		}
 	}
 
-	private boolean validateIsGroupInSubType(Long groupId) {
+	private boolean validateIsGroupInSubType(int groupId) {
 		SubTypeVO subType = groupsDao.getSubType(groupId);
 		return (subType == null) ? false : true;
 	}
@@ -434,20 +489,77 @@ public class OrderServiceImpl implements OrderService {
 		return commodityService.getCommodityIntervals(commodityIDsSet);
 	}
 	
-//	private Set<Long> getGroupIDsFromWorkOrders(List<WorkOrderVO> tradedList) {
-//		Set<Long> groupIDsSet = new HashSet<Long>();
-//		for (WorkOrderVO tradedVo : tradedList) {
-//			groupIDsSet.add(tradedVo.getGroupId());
-//		}
-//		return groupIDsSet;
-//	}
-
 	private Set<Integer> getCommodityIDsFromWorkOrders(List<WorkOrderVO> tradedList) {
 		Set<Integer> commodityIDsSet = new HashSet<Integer>();
 		for (WorkOrderVO tradedVo : tradedList) {
 			commodityIDsSet.add(tradedVo.getCommodityId());
 		}
 		return commodityIDsSet;
+	}
+	
+	private void processNextSellOrdersForBuyTrades(List<WorkOrderVO> nextOrdersList) {
+		List<WorkOrderVO> tradedList = workOrderDao.getTradedOrders("BUY");
+		if (CollectionUtils.isEmpty(tradedList)) {
+			return;
+		}
+		
+		Set<Integer> commodityIDsSet = getCommodityIDsFromWorkOrders(tradedList);
+		Map<Integer, CommodityVO> commodityIntervalsMap = getCommodityIntervals(commodityIDsSet);
+		Map<String, List<String>> groupCandidatesMap = workOrderDao.getGroupUsers();
+		
+		//TODO: get the commodity families and all commodities in that family.
+		// in Map<familyName, List<CommodityVO>> which includes intervals too
+		
+		for (WorkOrderVO tradedVo : tradedList) {
+			int groupId = tradedVo.getGroupId();
+			SubTypeVO subType = groupsDao.getSubType(groupId);
+			if (subType != null) {
+				// generate next SELL order for traded BUY order
+				// interval should be picked from COMMODITY.1st-Main-Interval
+				int commodityId = tradedVo.getCommodityId();
+				CommodityVO commodityVO = commodityIntervalsMap.get(commodityId);
+				generateNextOrders(tradedVo, groupCandidatesMap.get(tradedVo.getGroupName()), commodityVO.getMainInterval(), "SELL", nextOrdersList);
+				
+				// based on subTypeId, get other subTypes which are under this Type
+				List<Integer> subTypeIdsList = workOrderDao.getAllSubTypeIdsByGroupId(groupId);
+				
+				// the order should be descending order of recent executed subType
+				List<Integer> recentTradedSubTypesList = workOrderDao.getRecentTradedSubTypes(subTypeIdsList, groupId, commodityId);
+				
+				// get the 1st sub type in the descending order
+				if (CollectionUtils.isNotEmpty(recentTradedSubTypesList)) {
+					int iter = 0;
+					for (Integer tradedSubTypeId : recentTradedSubTypesList) {
+						// get the groups in that sub type.
+						List<Integer> groupsListBySubType = groupsDao.getGroupsBySubTypeId(tradedSubTypeId);
+						Map<Integer, Integer> groupCommodityIdMap = workOrderDao.getGroupCommodityIdsMap(tradedVo.getCommodityFamilyId());
+						
+						// iterate through the groups.
+						for (Integer groupIdBySubType : groupsListBySubType) {
+							// if mapping between group and any of the commodity in that family exists.
+
+							// check for any SELL positions for the Group-Commodity
+							if (groupCommodityIdMap.get(groupIdBySubType) != null) {
+								// if not there, place the SELL order.
+								Float interval = (iter == 0) ? commodityVO.getSubInterval2() : commodityVO.getSubInterval3();
+								generateNextOrders(tradedVo, groupCandidatesMap.get(tradedVo.getGroupName()), interval, "SELL", nextOrdersList);
+							}
+						}
+						
+						iter++;
+					}
+				}
+			} else {
+				// generate next SELL order for traded BUY order
+				// interval should be picked from GROUP-COMMODITY combination.
+				GroupCommodityVO groupCommodityVO = groupsDao.getGroupCommodityDetails(groupId, tradedVo.getCommodityId());
+				if (groupCommodityVO != null) {
+					generateNextOrders(tradedVo, groupCandidatesMap.get(tradedVo.getGroupName()), 
+							groupCommodityVO.getSellInterval(), "SELL", nextOrdersList);
+				}
+				
+			}
+		}
 	}
 
 }
